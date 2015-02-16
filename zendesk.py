@@ -1,36 +1,42 @@
 from zdesk import Zendesk, get_id_from_url
+import json
+from sys import argv
 
 zendesk = Zendesk('https://sent.zendesk.com', 'yaylalierin@gmail.com', 'sentzendesk')
 
 
 #list
-zendesk.ticket_list()
+# zendesk.ticket_list()
 
 #create
 new_ticket = {
     'ticket': {
-        'requester_name': 'Howard Schultz',
-        'requester_email': 'howard@starbucks.com',
-        'subject':'My Starbucks coffee is cold!',
-        'description': 'please reheat my coffee',
-        'set_tags': 'coffee drinks',
-        'ticket_field_entries': [
-            {
-                'ticket_field_id': 1,
-                'value': 'venti'
-            },
-            {
-                'ticket_field_id': 2,
-                'value': '$10'
-            }
-        ]
+        'requester_id':9999,
+        # 'recipient': 'howard@starbucks.com',
+        'subject':'help! i am upset',
+        'comment': {'body':'test'}
     }
 }
-# Create the ticket and get its URL
-result = zendesk.ticket_create(data=new_ticket)
+
+
+def main(file):
+	precontent = open(jsonfile).read()
+	content = json.loads(precontent)
+
+	for review in content["Reviews"]:
+		new_ticket["ticket"]["requester_name"] = review["Author"].encode('ascii','ignore')
+		new_ticket["ticket"]["requester_email"] = "customer@email.com"
+		new_ticket["ticket"]["subject"] = review["Title"].encode('ascii','ignore')
+		new_ticket["ticket"]["comment"]["body"] = review["Content"].encode('ascii','ignore')
+
+		# Create the ticket and get its URL
+		result = zendesk.ticket_create(data=new_ticket)
+
+	jsonfile.close()
+
+if __name__ == "__main__":
+    input_file_1 = argv[1]
+    main(input_file_1)
 
 # # Show
 # zendesk.ticket_show(id=ticket_id)
-
-# # Delete
-# zendesk.ticket_delete(id=ticket_id)
