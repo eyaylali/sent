@@ -5,15 +5,11 @@ import os
 
 zendesk = Zendesk('https://sent.zendesk.com', os.environ["EMAIL"], os.environ["PASSWORD"])
 
-
-#list
-# zendesk.ticket_list()
-
 #create
 new_ticket = {
     'ticket': {
-        'requester_id':9999,
-        # 'recipient': 'howard@starbucks.com',
+    	# 'source':{'channel': 'api'}
+        'requester':{'name': 'Ms. Example','email': 'example@customer.com'},
         'subject':'help! i am upset',
         'comment': {'body':'test'}
     }
@@ -39,6 +35,3 @@ def main(file):
 if __name__ == "__main__":
     input_file_1 = argv[1]
     main(input_file_1)
-
-# # Show
-# zendesk.ticket_show(id=ticket_id)
