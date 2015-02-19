@@ -21,27 +21,16 @@ sentence_re = r'''(?x)
 		#separate tokens
 		| [][.,;"'?():-_`]
 		'''
-all_tokenized_reviews_dict = {}
 
-def unpack_and_tokenize(input_file):
-
-	opened_file = open(input_file).read()
-	content = json.loads(opened_file)
-
-	for review in content["Reviews"]:
+def tokenize_text(input_string):
+		#tokenize with sensitivity towards regular expressions
+		tokens = nltk.regexp_tokenize(input_string, sentence_re)
+		#remove all stopwords
+		tokens_final = [w for w in tokens if w.lower() not in stopwords]
+		#preserve words in all caps
+		content = [w.lower() if w.isupper() != True else w for w in tokens_final]
 		
-
-		tokens_all = nltk.regexp_tokenize(all_text, sentence_re)
-		tokens_title = nltk.regexp_tokenize(title, sentence_re)
-		tokens_content = nltk.regexp_tokenize(review_content, sentence_re)
-
-		tokens_all_final = [w for w in tokens_all if w.lower() not in stopwords]
-		tokens_title_final = [w for w in tokens_title if w.lower() not in stopwords]
-		tokens_content_final = [w for w in tokens_content if w.lower() not in stopwords]
-
-		content = [w.lower() if w.isupper() != True else w for w in tokens_all_final]
-		
-	return all_tokenized_reviews_dict
+		return tokens
 
 
 # def preserve_case(main_dict):
@@ -66,6 +55,10 @@ if __name__ == "__main__":
 #think about tweets
 #get rid of numbers, $money, 
 
+		###UNPACK JSON DATA FILES
+
+		# opened_file = open(input_file).read()
+		# content = json.loads(opened_file)
 
 		# title = review["Title"].encode('ascii','ignore')
 		# review_content = review["Content"].encode('ascii','ignore')
