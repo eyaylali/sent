@@ -55,13 +55,4 @@ if __name__ == "__main__":
 #think about tweets
 #get rid of numbers, $money, 
 
-		###UNPACK JSON DATA FILES
-
-		# opened_file = open(input_file).read()
-		# content = json.loads(opened_file)
-
-		# title = review["Title"].encode('ascii','ignore')
-		# review_content = review["Content"].encode('ascii','ignore')
-		# author = review["Author"].encode('ascii','ignore')
-		# id = review["ReviewID"].encode('ascii','ignore')
-		# all_text = title + ' ' + review_content
+		

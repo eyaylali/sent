@@ -1,4 +1,4 @@
-from zdesk import Zendesk, get_id_from_url
+from zdesk import Zendesk
 import json
 from sys import argv
 import os
