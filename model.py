@@ -15,9 +15,11 @@ Base.query = session.query_property()
 class Ticket(Base):
 	__tablename__ = "tickets"
 
-	ticket_id = Column(Integer, primary_key = True, nullable = False)
+	id = Column(Integer, primary_key = True)
+	ticket_id = Column(Integer, nullable = False)
+	customer_id = Column(Integer, ForeignKey('users.id'), nullable = False)
 	submitter_id = Column(Integer, nullable = False)
-	customer_id = Column(Integer, ForeignKey('customers.id'), nullable = False)
+	zendesk_customer_id = Column(Integer, nullable = False)
 	assignee_id = Column(Integer, nullable = False)
 	timestamp = Column(DateTime, nullable = False)
 	subject = Column(String(200), nullable = False)
@@ -26,16 +28,17 @@ class Ticket(Base):
 	url = Column(String(300), nullable = False)
 	source = Column(String(64), nullable = True)
 
-	customer = relationship("Customer", backref=backref("tickets", order_by=id))
+	customer = relationship("User", backref=backref("tickets", order_by=id))
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
 		pass
 
-class Customer(Base):
-	__tablename__ = "customers"
+class User(Base):
+	__tablename__ = "users"
 
-	id = Column(Integer, primary_key = True, nullable = False)
+	id = Column(Integer, primary_key = True)
+	zendesk_customer_id = Column(Integer, nullable = False)
 	role = Column(String(64), nullable = False)
 	name = Column(String(100), nullable = False)
 	email = Column(String(100), nullable = False)
