@@ -2,7 +2,7 @@ from zdesk import Zendesk
 from tokenizer import tokenize_text
 import model
 from model import Ticket, Customer, session
-import datetime
+from datetime import datetime
 import os
 import sys
 
@@ -36,7 +36,7 @@ def unpack_zendesk_users_tickets(session, dict_input):
 				zendesk_customer_id = int(ticket["requester_id"]) #might not need to record again
 				assignee_id = int(ticket["assignee_id"])
 				source = ticket["via"]["channel"]
-				timestamp = datetime.datetime.strptime(ticket["created_at"], "%Y-%m-%d")
+				timestamp = datetime.strptime(ticket["created_at"], "%Y-%m-%dT%H:%M:%SZ")
 				ticket_id = int(ticket["id"])
 				url = ticket["url"]
 				status = ticket["status"]

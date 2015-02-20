@@ -24,7 +24,7 @@ sentence_re = r'''(?x)
 		#ellipsis
 		| \.\.\.
 		#separate tokens
-		| [][.,;"'?():-_`]
+		| [.,;"'?():-_`=|/]+
 		'''
 
 def tokenize_text(input_string):
@@ -35,7 +35,7 @@ def tokenize_text(input_string):
 		#preserve words in all caps
 		content = [w.lower() if w.isupper() != True else w for w in tokens_final]
 		
-		return tokens
+		return content
 
 
 # def preserve_case(main_dict):
