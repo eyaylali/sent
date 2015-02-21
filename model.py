@@ -1,10 +1,10 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PickleType
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 
-engine = create_engine("sqlite:///sent.db", echo=False)
-session = scoped_session(sessionmaker(bind=engine,
+ENGINE = create_engine("sqlite:///sent.db", echo=False)
+session = scoped_session(sessionmaker(bind=ENGINE,
 									  autocommit = False,
 									  autoflush = False))
 
@@ -16,19 +16,20 @@ class Ticket(Base):
 	__tablename__ = "tickets"
 
 	id = Column(Integer, primary_key = True)
-	ticket_id = Column(Integer, nullable = False)
-	customer_id = Column(Integer, ForeignKey('users.id'), nullable = False)
-	submitter_id = Column(Integer, nullable = False)
-	zendesk_customer_id = Column(Integer, nullable = False)
-	assignee_id = Column(Integer, nullable = False)
-	timestamp = Column(DateTime, nullable = False)
-	subject = Column(String(200), nullable = False)
-	content = Column(String(3000), nullable = False)
-	status = Column(String(64), nullable = True)
-	url = Column(String(300), nullable = False)
-	source = Column(String(64), nullable = True)
+	ticket_id = Column(Integer)
+	user_id = Column(Integer, ForeignKey('users.id'))
+	submitter_id = Column(Integer)
+	assignee_id = Column(Integer)
+	timestamp = Column(DateTime)
+	subject = Column(String(200))
+	content = Column(String(3000))
+	tokenized_subject = Column(PickleType)
+	tokenized_content = Column(PickleType)
+	status = Column(String(64))
+	url = Column(String(300))
+	source = Column(String(64))
 
-	customer = relationship("User", backref=backref("tickets", order_by=id))
+	user = relationship("User", backref=backref("tickets", order_by=id))
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
@@ -38,14 +39,14 @@ class User(Base):
 	__tablename__ = "users"
 
 	id = Column(Integer, primary_key = True)
-	zendesk_customer_id = Column(Integer, nullable = False)
-	role = Column(String(64), nullable = False)
-	name = Column(String(100), nullable = False)
-	email = Column(String(100), nullable = False)
-	url = Column(String(300), nullable = False)
+	zendesk_user_id = Column(Integer)
+	role = Column(String(64))
+	name = Column(String(100))
+	email = Column(String(100))
+	url = Column(String(300))
 	notes = Column(String(1000), nullable = True)
-	time_zone = Column(String(64), nullable = False)
-	phone = Column(String(64), nullable = False)
+	time_zone = Column(String(64))
+	phone = Column(String(64), nullable = True)
 	details = Column(String(1000), nullable = True)
 
 	def __repr__(self):
@@ -55,8 +56,9 @@ class User(Base):
 ### End class declarations
 
 def main():
-	"""In case we need this for something"""
+	Base.metadata.create_all(bind=ENGINE)
 	pass
+	
 
 if __name__ == "__main__":
 	main()
