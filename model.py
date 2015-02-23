@@ -56,7 +56,7 @@ class User(Base):
 ### End class declarations
 
 def main():
-	Base.metadata.create_all(bind=ENGINE)
+	# Base.metadata.create_all(bind=ENGINE)
 	pass
 	
 

@@ -9,7 +9,6 @@ NEGATION = ["never","no","nothing","nowhere","noone","none","not","havent","hasn
 negation_list = ['never', 'no', 'nothing', 'nowhere', 'noone', 'none', 'not', 'haven\'t', 'havent', 'hasn\'t', 'hasnt', 
                 'can\'t', 'cant', 'couldn\'t', 'couldnt', 'shouldn\'t', 'shouldnt', 'won\'t', 'wont', 'wouldn\'t', 'wouldnt', 
                 'dont', 'doesnt', 'didnt', 'isnt', 'arent', 'aint', 'don\'t', 'doesn\'t', 'didn\'t', 'isn\'t', 'aren\'t', 'ain\'t']
-
 punctuation_list = ['.', ':', ';', '!', '?']
 
 stopwords = nltk.corpus.stopwords.words('english')
