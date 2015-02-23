@@ -36,13 +36,3 @@ def main():
 if __name__ == "__main__":
     # script, input_path= argv
     main()
-
-import random
-
-with open("datafile.txt", "rb") as f:
-    data = f.read().split('\n')
-
-random.shuffle(data)
-
-train_data = data[:50]
-test_data = data[50:]
