@@ -29,7 +29,7 @@ def main():
 		with open(filename, 'r') as f:
 			json_obj = json.load(f)
 			for review in json_obj["Reviews"]:
-				num_train_reviews = int(len(review) * .9)
+				num_train_reviews = int(len(json_obj["Reviews"]) * .9)
 				review_id, tokenized = unpack_review(review)
 				if review_id and tokenized:
 					if tokenized not in train_reviews_dict.values() and tokenized not in test_reviews_dict.values():
@@ -38,7 +38,7 @@ def main():
 							counter = counter + 1
 						else:
 							test_reviews_dict[review_id] = tokenized
-		print "TEST",test_reviews_dict,"TRAIN",train_reviews_dict
+		print "TEST",len(test_reviews_dict),"TRAIN",len(train_reviews_dict)
 
 if __name__ == "__main__":
     main()
