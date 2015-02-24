@@ -3,11 +3,12 @@ import json
 from glob import glob
 import os
 from sys import argv
-from tokenizer import tokenize_text               # import numpy
-import json                          # library for reading json in python
+from tokenizer import tokenize_text
+import json                          
 
 
-all_tokenized_reviews_dict = {}
+train_reviews_dict = {}
+test_reviews_dict = {}
 
 def unpack_review(review):
 	if "Title" not in review or "Content" not in review or "Ratings" not in review or "ReviewID" not in review:
@@ -23,22 +24,21 @@ def unpack_review(review):
 	return id, tokenized_dict
 
 def main():
-	count = 0
-	for filename in glob('data/*.json'):
+	counter = 0
+	for filename in glob('test-data/*.json'):
 		with open(filename, 'r') as f:
 			json_obj = json.load(f)
 			for review in json_obj["Reviews"]:
+				num_train_reviews = int(len(review) * .9)
 				review_id, tokenized = unpack_review(review)
 				if review_id and tokenized:
-					print review_id
-					if tokenized not in all_tokenized_reviews_dict.values():
-						all_tokenized_reviews_dict[review_id] = tokenized
-						print tokenized
-			#assign 90% to training set and 10% to testing set
-			# count = count +1
-			
-	
+					if tokenized not in train_reviews_dict.values() and tokenized not in test_reviews_dict.values():
+						if counter <= num_train_reviews:
+							train_reviews_dict[review_id] = tokenized
+							counter = counter + 1
+						else:
+							test_reviews_dict[review_id] = tokenized
+		print "TEST",test_reviews_dict,"TRAIN",train_reviews_dict
 
 if __name__ == "__main__":
-    # script, input_path= argv
     main()
