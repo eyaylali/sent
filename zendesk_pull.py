@@ -1,5 +1,5 @@
 from zdesk import Zendesk
-from tokenizer import tokenize_text
+from tokenizer import tokenize_text, bag_of_words
 import model
 from model import Ticket, User, session
 from datetime import datetime
@@ -30,8 +30,8 @@ def unpack_zendesk_users_tickets(session, dict_input, dict_input2):
 		user_tickets = zendesk.user_tickets_requested(zendesk_user_id)
 		for ticket in dict_input2["tickets"]:
 			if ticket["status"] == "open" or "pending":
-				tokenized_subject = tokenize_text(ticket["subject"])
-				tokenized_content = tokenize_text(ticket["description"])
+				tokenized_subject = tokenize_text(ticket["subject"]))
+				tokenized_content = tokenize_text(ticket["description"]))
 				subject = ticket["subject"]
 				content = ticket["description"]
 				submitter_id = int(ticket["submitter_id"])

@@ -35,8 +35,8 @@ def tokenize_text(input_string):
 		content = [w.lower() if w.isupper() != True else w for w in tokens_final]
 		return content
 
-# def bag_of_words(list_words):
-# 	return dict([(word, True) for word in list_words])
+def bag_of_words(list_words):
+	return dict([(word, True) for word in list_words])
 
 
 

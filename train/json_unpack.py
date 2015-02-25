@@ -6,9 +6,9 @@ from sys import argv
 from tokenizer import tokenize_text
 import json                          
 
-
 train_reviews_dict = {}
 test_reviews_dict = {}
+review_categories = [1,2,3,4,5]
 
 def unpack_review(review):
 	if "Title" not in review or "Content" not in review or "Ratings" not in review or "ReviewID" not in review:
@@ -38,7 +38,7 @@ def main():
 							counter = counter + 1
 						else:
 							test_reviews_dict[review_id] = tokenized
-		print "TEST",len(test_reviews_dict),"TRAIN",len(train_reviews_dict)
+		print test_reviews_dict, train_reviews_dict
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
