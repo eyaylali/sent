@@ -23,8 +23,6 @@ class Ticket(Base):
 	timestamp = Column(DateTime)
 	subject = Column(String(200))
 	content = Column(String(3000))
-	tokenized_subject = Column(PickleType)
-	tokenized_content = Column(PickleType)
 	status = Column(String(64))
 	url = Column(String(300))
 	source = Column(String(64))
@@ -43,11 +41,21 @@ class User(Base):
 	role = Column(String(64))
 	name = Column(String(100))
 	email = Column(String(100))
-	url = Column(String(300))
-	notes = Column(String(1000), nullable = True)
-	time_zone = Column(String(64))
-	phone = Column(String(64), nullable = True)
-	details = Column(String(1000), nullable = True)
+	organization_id = Column(Integer, ForeignKey('organizations.id'))
+
+	organization = relationship("Organization", backref=backref("users", order_by=id))
+
+	def __repr__(self):
+		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
+		pass
+
+class Organization(Base):
+	__tablename__ = "organizations"
+
+	id = Column(Integer, primary_key = True)
+	zendesk_org_id = Column(Integer)
+	name = Column(String(100))
+	tags = Column(PickleType) #list
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
@@ -56,7 +64,7 @@ class User(Base):
 ### End class declarations
 
 def main():
-	# Base.metadata.create_all(bind=ENGINE)
+	#Base.metadata.create_all(bind=ENGINE)
 	pass
 	
 

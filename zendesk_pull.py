@@ -1,5 +1,5 @@
 from zdesk import Zendesk
-from tokenizer import tokenize_text, bag_of_words
+from tokenizer import tokenize_text
 import model
 from model import Ticket, User, session
 from datetime import datetime
@@ -9,29 +9,27 @@ import sys
 zendesk = Zendesk("https://sent.zendesk.com", os.environ["EMAIL"], os.environ["PASSWORD"])
 TICKETS = zendesk.tickets_list()
 USERS = zendesk.users_list()
+ORGANIZATIONS = zendesk.organizations_list()
 
-def unpack_zendesk_users_tickets(session, dict_input, dict_input2):
+# user_tickets = zendesk.user_tickets_requested(789440538)
+# print user_tickets
+
+def unpack_zendesk_users_tickets(session, dict_input):
 	for user in dict_input["users"]:
 		zendesk_user_id = int(user["id"])
 		role = user["role"]
 		name = user["name"]
-		details = user["details"]
 		email = user["email"]
-		phone = user["phone"]
-		url = user["url"]
-		time_zone = user["time_zone"]
-		notes = user["notes"]
+		organization_id = user["organization_id"]
 
-		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email, url = url, notes = notes, time_zone = time_zone, phone = phone, details = details)
+		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email, organization_id = organization_id)
 		session.add(user)
 		session.commit()
 		session.refresh(user)
 
 		user_tickets = zendesk.user_tickets_requested(zendesk_user_id)
-		for ticket in dict_input2["tickets"]:
-			if ticket["status"] == "open" or "pending":
-				tokenized_subject = tokenize_text(ticket["subject"]))
-				tokenized_content = tokenize_text(ticket["description"]))
+		for ticket in user_tickets["tickets"]:
+			if ticket["status"] == "open" or ticket["status"] == "pending":
 				subject = ticket["subject"]
 				content = ticket["description"]
 				submitter_id = int(ticket["submitter_id"])
@@ -42,12 +40,24 @@ def unpack_zendesk_users_tickets(session, dict_input, dict_input2):
 				url = ticket["url"]
 				status = ticket["status"]
 
-				ticket = model.Ticket(ticket_id = ticket_id, submitter_id = submitter_id, assignee_id = assignee_id, timestamp = timestamp, subject = subject, content = content, status = status, url = url, source = source, tokenized_subject = tokenized_subject, tokenized_content = tokenized_content)
+				ticket = model.Ticket(ticket_id = ticket_id, submitter_id = submitter_id, assignee_id = assignee_id, timestamp = timestamp, subject = subject, content = content, status = status, url = url, source = source)
 				session.add(ticket)
 		session.commit()
 
+def unpack_zendesk_organizations(session, dict_input):
+	for organization in dict_input["organizations"]:
+		zendesk_org_id = organization["id"]
+		name = organization["name"]
+		tags = organization["tags"]
+
+		organization = model.Organization(zendesk_org_id = zendesk_org_id, name = name, tags = tags)
+		session.add(organization)
+	session.commit()
+
+
 def main(session):
-    unpack_zendesk_users_tickets(session, USERS, TICKETS)
+    unpack_zendesk_users_tickets(session, USERS)
+    unpack_zendesk_organizations(session, ORGANIZATIONS)
     
 if __name__ == "__main__":
 	main(session)
