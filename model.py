@@ -17,7 +17,7 @@ class Ticket(Base):
 
 	id = Column(Integer, primary_key = True)
 	ticket_id = Column(Integer)
-	user_id = Column(Integer, ForeignKey('users.id'))
+	user_id = Column(Integer, ForeignKey('users.zendesk_user_id'))
 	submitter_id = Column(Integer)
 	assignee_id = Column(Integer)
 	timestamp = Column(DateTime)
@@ -42,7 +42,7 @@ class User(Base):
 	role = Column(String(64))
 	name = Column(String(100))
 	email = Column(String(100))
-	organization_id = Column(Integer, ForeignKey('organizations.id'))
+	organization_id = Column(Integer, ForeignKey('organizations.zendesk_org_id'))
 
 	organization = relationship("Organization", backref=backref("users", order_by=id))
 

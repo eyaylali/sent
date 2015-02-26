@@ -12,6 +12,8 @@ from tokenizer import tokenize_text
 import json
 from sklearn.externals import joblib
 
+
+
 text_data = []
 labels = []
 
@@ -48,11 +50,20 @@ def unpack_review(review):
 		label = "positive"
 	return all_content, label
 
+# def preprocess_and_train(data_list, labels):
+#     vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False) #Convert a collection of text documents to a matrix of token counts & convert to a matrix of normalized TF-IDF features
+#     classifier = BernoulliNB()
+#     pipe = Pipeline([('vect', vectorizer),('clf', classifier)])
+#     trained = pipe.fit(data_list, labels)
+#     # predicted = pipe.predict(X_test)
+#     # evaluate_model(y_test,predicted)
+#     joblib.dump(trained, "classifier2.pickle")
+
 def preprocess(data_list, catgory_list):
     vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False) #Convert a collection of text documents to a matrix of token counts & convert to a matrix of normalized TF-IDF features
     matrix_X = vectorizer.fit_transform(data_list) #Learn vocabulary and idf, return term-document matrix
+    joblib.dump(vectorizer, "vectorizer.pickle")
     return matrix_X
-
 
 def learn_model(matrix_X,labels_y):
 	#split data into training and testing sets (90% train, 10% test)

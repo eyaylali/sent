@@ -6,17 +6,14 @@ from datetime import datetime
 import os
 import sys
 from sklearn.externals import joblib
-
+ 
 zendesk = Zendesk("https://sent.zendesk.com", os.environ["EMAIL"], os.environ["PASSWORD"])
 TICKETS = zendesk.tickets_list()
 USERS = zendesk.users_list()
 ORGANIZATIONS = zendesk.organizations_list()
 
-# f = open('train/classifier.pickle', 'rb')
-# classifier = pickle.load(f)
-
 # load the saved pipeline that includes vectorizer & classifier
-classifier = joblib.load('class.pkl')
+# classifier = joblib.load('train/classifier.pickle')
 
 def unpack_zendesk_users_tickets(session, dict_input):
 	for user in dict_input["users"]:
@@ -24,8 +21,9 @@ def unpack_zendesk_users_tickets(session, dict_input):
 		role = user["role"]
 		name = user["name"]
 		email = user["email"]
+		organization_id = user["organization_id"]
 
-		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email)
+		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email, organization_id = organization_id)
 		session.add(user)
 		session.commit()
 		session.refresh(user)
@@ -36,6 +34,7 @@ def unpack_zendesk_users_tickets(session, dict_input):
 				subject = ticket["subject"]
 				content = ticket["description"]
 				all_content = subject + " " + content
+				user_id = int(ticket["requester_id"])
 				submitter_id = int(ticket["submitter_id"])
 				assignee_id = int(ticket["assignee_id"])
 				source = ticket["via"]["channel"]
@@ -43,9 +42,10 @@ def unpack_zendesk_users_tickets(session, dict_input):
 				ticket_id = int(ticket["id"])
 				url = ticket["url"]
 				status = ticket["status"]
-				label = predict_sentiment_label(all_content)
+				# label = predict_sentiment_label(all_content)
+				label = "fake"
 
-				ticket = model.Ticket(ticket_id = ticket_id, submitter_id = submitter_id, assignee_id = assignee_id, timestamp = timestamp, subject = subject, content = content, status = status, url = url, source = source, sentiment_label = label)
+				ticket = model.Ticket(ticket_id = ticket_id, user_id = user_id, submitter_id = submitter_id, assignee_id = assignee_id, timestamp = timestamp, subject = subject, content = content, status = status, url = url, source = source, sentiment_label = label)
 				session.add(ticket)
 		session.commit()
 
@@ -64,12 +64,9 @@ def predict_sentiment_label(all_content):
 	label = classifier.predict(token_list)
 	return label
 
-
-
-
 def main(session):
-    unpack_zendesk_users_tickets(session, USERS)
-    unpack_zendesk_organizations(session, ORGANIZATIONS)
+	unpack_zendesk_organizations(session, ORGANIZATIONS)
+	unpack_zendesk_users_tickets(session, USERS)
     
 if __name__ == "__main__":
 	main(session)
