@@ -20,9 +20,8 @@ def unpack_zendesk_users_tickets(session, dict_input):
 		role = user["role"]
 		name = user["name"]
 		email = user["email"]
-		organization_id = user["organization_id"]
 
-		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email, organization_id = organization_id)
+		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email)
 		session.add(user)
 		session.commit()
 		session.refresh(user)
