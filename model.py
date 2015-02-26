@@ -26,6 +26,7 @@ class Ticket(Base):
 	status = Column(String(64))
 	url = Column(String(300))
 	source = Column(String(64))
+	sentiment_label = Column(String(64))
 
 	user = relationship("User", backref=backref("tickets", order_by=id))
 

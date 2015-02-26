@@ -10,9 +10,7 @@ import os
 from sys import argv
 from tokenizer import tokenize_text
 import json
-import pickle
-
-# text_clf = Pipeline([('vect', CountVectorizer()),('tfidf', TfidfTransformer()),('clf', BernoulliNB())])
+from sklearn.externals import joblib
 
 text_data = []
 labels = []
@@ -43,9 +41,9 @@ def unpack_review(review):
 	all_content= title +" "+ review_content
 
 	if rating == "1.0" or rating == "2.0":
-		label = "upset"
+		label = "very upset"
 	elif rating == "3.0":
-		label = "neutral"
+		label = "dissatisfied"
 	else:
 		label = "positive"
 	return all_content, label
@@ -66,7 +64,7 @@ def learn_model(matrix_X,labels_y):
     #run the classification report to compare results of the labels the classifier gave to the true labels
     evaluate_model(y_test,predicted)
     #save the trained classifier in order to access it and apply to new data without labels
-    clf2 = pickle.dumps(classifier)
+    joblib.dump(classifier, "classifier.pickle")
 
 def evaluate_model(label_true,label_predicted):
     print classification_report(label_true,label_predicted)

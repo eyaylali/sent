@@ -33,10 +33,14 @@ def tokenize_text(input_string):
 		tokens_final = [w for w in tokens if w.lower() not in stopwords]
 		#preserve words in all caps
 		content = [w.lower() if w.isupper() != True else w for w in tokens_final]
+
 		return content
 
-def bag_of_words(list_words):
-	return dict([(word, True) for word in list_words])
+# def negating(input_list):
+# 	for word in input_list:
+# 		if word in 
+
+
 
 
 
