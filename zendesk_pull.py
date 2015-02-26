@@ -1,5 +1,6 @@
 from zdesk import Zendesk
 from tokenizer import tokenize_text
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 import model
 from model import Ticket, User, session
 from datetime import datetime
@@ -13,7 +14,7 @@ USERS = zendesk.users_list()
 ORGANIZATIONS = zendesk.organizations_list()
 
 # load the saved pipeline that includes vectorizer & classifier
-# classifier = joblib.load('train/classifier.pickle')
+classifier = joblib.load('train/classifier.pickle')
 
 def unpack_zendesk_users_tickets(session, dict_input):
 	for user in dict_input["users"]:
@@ -42,8 +43,8 @@ def unpack_zendesk_users_tickets(session, dict_input):
 				ticket_id = int(ticket["id"])
 				url = ticket["url"]
 				status = ticket["status"]
-				# label = predict_sentiment_label(all_content)
-				label = "fake"
+				label = predict_sentiment_label(all_content)
+				
 
 				ticket = model.Ticket(ticket_id = ticket_id, user_id = user_id, submitter_id = submitter_id, assignee_id = assignee_id, timestamp = timestamp, subject = subject, content = content, status = status, url = url, source = source, sentiment_label = label)
 				session.add(ticket)
@@ -60,8 +61,9 @@ def unpack_zendesk_organizations(session, dict_input):
 	session.commit()
 
 def predict_sentiment_label(all_content):
-	token_list = tokenize_text(all_content)
-	label = classifier.predict(token_list)
+	vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False)
+	X_new_tfidf = vectorizer.transform(all_content)
+	label = classifier.predict(X_new_tfidf)
 	return label
 
 def main(session):

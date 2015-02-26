@@ -50,19 +50,9 @@ def unpack_review(review):
 		label = "positive"
 	return all_content, label
 
-# def preprocess_and_train(data_list, labels):
-#     vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False) #Convert a collection of text documents to a matrix of token counts & convert to a matrix of normalized TF-IDF features
-#     classifier = BernoulliNB()
-#     pipe = Pipeline([('vect', vectorizer),('clf', classifier)])
-#     trained = pipe.fit(data_list, labels)
-#     # predicted = pipe.predict(X_test)
-#     # evaluate_model(y_test,predicted)
-#     joblib.dump(trained, "classifier2.pickle")
-
 def preprocess(data_list, catgory_list):
     vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False) #Convert a collection of text documents to a matrix of token counts & convert to a matrix of normalized TF-IDF features
     matrix_X = vectorizer.fit_transform(data_list) #Learn vocabulary and idf, return term-document matrix
-    joblib.dump(vectorizer, "vectorizer.pickle")
     return matrix_X
 
 def learn_model(matrix_X,labels_y):
@@ -70,8 +60,8 @@ def learn_model(matrix_X,labels_y):
     X_train,X_test,y_train,y_test = cross_validation.train_test_split(matrix_X,labels_y,test_size=0.1,random_state=0)
     #the classifier I will use to train my data
     classifier = BernoulliNB().fit(X_train,y_train)
-    #apply the results of the training to predict the label on the 10% test set
-    predicted = classifier.predict(X_test)
+    #apply the results of the training to predict the label on the 10% test set 
+   	predicted = clf.predict(X_test)
     #run the classification report to compare results of the labels the classifier gave to the true labels
     evaluate_model(y_test,predicted)
     #save the trained classifier in order to access it and apply to new data without labels
