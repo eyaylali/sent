@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.before_request
 def before_request():
 	g.user_list = model.session.query(model.User).all()
-	g.unread_message_list = model.session.query(model.Ticket).all()
+	g.message_list = model.session.query(model.Ticket).all()
 
 @app.route("/")
 def index():

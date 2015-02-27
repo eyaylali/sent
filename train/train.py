@@ -51,9 +51,9 @@ def unpack_review(review):
 	return all_content, label
 
 def preprocess(data_list, catgory_list):
-    vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False) #Convert a collection of text documents to a matrix of token counts & convert to a matrix of normalized TF-IDF features
-    matrix_X = vectorizer.fit_transform(data_list) #Learn vocabulary and idf, return term-document matrix
-    return matrix_X
+	vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False) #Convert a collection of text documents to a matrix of token counts & convert to a matrix of normalized TF-IDF features
+	matrix_X = vectorizer.fit_transform(data_list) #Learn vocabulary and idf, return term-document matrix
+	return matrix_X
 
 def learn_model(matrix_X,labels_y):
 	#split data into training and testing sets (90% train, 10% test)
@@ -61,7 +61,7 @@ def learn_model(matrix_X,labels_y):
     #the classifier I will use to train my data
     classifier = BernoulliNB().fit(X_train,y_train)
     #apply the results of the training to predict the label on the 10% test set 
-   	predicted = clf.predict(X_test)
+    predicted = classifier.predict(X_test)
     #run the classification report to compare results of the labels the classifier gave to the true labels
     evaluate_model(y_test,predicted)
     #save the trained classifier in order to access it and apply to new data without labels
