@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 import sys
 from sklearn.externals import joblib
+import pdb
  
 zendesk = Zendesk("https://sent.zendesk.com", os.environ["EMAIL"], os.environ["PASSWORD"])
 TICKETS = zendesk.tickets_list()
@@ -15,6 +16,7 @@ ORGANIZATIONS = zendesk.organizations_list()
 
 # load the saved pipeline that includes vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')
+vectorizer = joblib.load('train/vectorizer.pickle')
 
 def unpack_zendesk_users_tickets(session, dict_input):
 	for user in dict_input["users"]:
@@ -44,10 +46,9 @@ def unpack_zendesk_users_tickets(session, dict_input):
 				url = ticket["url"]
 				status = ticket["status"]
 				label = predict_sentiment_label(all_content)
-		
-
 				ticket = model.Ticket(ticket_id = ticket_id, user_id = user_id, submitter_id = submitter_id, assignee_id = assignee_id, timestamp = timestamp, subject = subject, content = content, status = status, url = url, source = source, sentiment_label = label)
 				session.add(ticket)
+
 		session.commit()
 
 def unpack_zendesk_organizations(session, dict_input):
@@ -61,8 +62,9 @@ def unpack_zendesk_organizations(session, dict_input):
 	session.commit()
 
 def predict_sentiment_label(all_content):
-	label = classifier.predict(all_content)
-	return label
+	vect = vectorizer.transform([all_content])
+	label = classifier.predict(vect)
+	return label[0]
 
 def main(session):
 	unpack_zendesk_organizations(session, ORGANIZATIONS)
@@ -70,4 +72,3 @@ def main(session):
     
 if __name__ == "__main__":
 	main(session)
-
