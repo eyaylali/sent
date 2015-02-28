@@ -1,6 +1,6 @@
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
-from sklearn.cross_validation import ShuffleSplit
+from sklearn.cross_validation import ShuffleSplit, StratifiedKFold, train_test_split
 from sklearn.metrics import classification_report
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -11,6 +11,7 @@ from sys import argv
 from tokenizer import tokenize_text
 import json
 from sklearn.externals import joblib
+import pdb
 
 
 
@@ -50,36 +51,29 @@ def unpack_review(review):
 		label = "positive"
 	return all_content, label
 
-def create_model():
-	tfidf = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False, analyzer = "word")
-	clf = MultinomialNB()
-	pipleline = Pipeline([('vect', tfidf), ('clf', clf)])
-	return pipleline
+def preprocess(data_list, category_list):
+	vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False) #Convert a collection of text documents to a matrix of token counts & convert to a matrix of normalized TF-IDF features
+	X = vectorizer.fit_transform(data_list) #Learn vocabulary and idf, return term-document matrix
+	y = np.array(labels)
+	joblib.dump(vectorizer, "vectorizer.pickle")
+	return X, y
 
-def train_model(clf, review_data, labels):
-	cross_validation = ShuffleSplit(n=len(review_data), n_iter = 10, test_size = 0.1, indices = True, random_state = 0)
-
-	for train, test in cross_validation:
-		X_train, y_train = review_data[train], labels[train]
-		X_test, y_test = review_data[test], labels[test]
-
-		classifier = clf
-		classifier.fit(X_train, y_train)
-
-	predicted = classifier.predict(X_test)
-	evaluate_model(y_test, predicted)
-	joblib.dump(classifier, "classifier.pickle")
+def learn_model(X,y):
+    X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.1)
+    classifier = BernoulliNB()
+    classifier.fit(X_train, y_train)
+    predicted = classifier.predict(X_test)
+    evaluate_model(y_test, predicted)
+    joblib.dump(classifier, "classifier.pickle")
 
 def evaluate_model(label_true,label_predicted):
     print classification_report(label_true,label_predicted)
     print "The accuracy score is {:.2%}".format(accuracy_score(label_true,label_predicted))
 
 def main():
-	review_data, labels = parse_files('test-data/*.json')
-	clf = create_model()
-	train_model(clf, review_data, labels)
-
-	
+	review_data, labels = parse_files('test/*.json')
+	X, y = preprocess(review_data, labels)
+	learn_model(X, y)
 
 
 if __name__ == "__main__":

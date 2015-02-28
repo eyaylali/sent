@@ -16,7 +16,6 @@ ORGANIZATIONS = zendesk.organizations_list()
 
 # load the saved pipeline that includes vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')
-vectorizer = joblib.load('train/vectorizer.pickle')
 
 def unpack_zendesk_users_tickets(session, dict_input):
 	for user in dict_input["users"]:
@@ -63,8 +62,7 @@ def unpack_zendesk_organizations(session, dict_input):
 	session.commit()
 
 def predict_sentiment_label(all_content):
-	vect = vectorizer.transform([all_content])
-	label = classifier.predict(vect)
+	label = classifier.predict([all_content])
 	return label[0]
 
 def main(session):
