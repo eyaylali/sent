@@ -46,6 +46,7 @@ def unpack_zendesk_users_tickets(session, dict_input):
 				url = ticket["url"]
 				status = ticket["status"]
 				label = predict_sentiment_label(all_content)
+				
 				ticket = model.Ticket(ticket_id = ticket_id, user_id = user_id, submitter_id = submitter_id, assignee_id = assignee_id, timestamp = timestamp, subject = subject, content = content, status = status, url = url, source = source, sentiment_label = label)
 				session.add(ticket)
 
