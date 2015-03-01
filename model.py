@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PickleType
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 
-ENGINE = create_engine("sqlite:///sent2.db", echo=False)
+ENGINE = create_engine("sqlite:///sent.db", echo=False)
 session = scoped_session(sessionmaker(bind=ENGINE,
 									  autocommit = False,
 									  autoflush = False))
@@ -65,7 +65,7 @@ class Organization(Base):
 ### End class declarations
 
 def main():
-	Base.metadata.create_all(bind=ENGINE)
+	#Base.metadata.create_all(bind=ENGINE)
 	pass
 	
 

@@ -30,18 +30,11 @@ def tokenize_text(input_string):
 		#tokenize with sensitivity towards regular expressions
 		tokens = nltk.regexp_tokenize(input_string, sentence_re)
 		#remove all stopwords
-		tokens_final = [w for w in tokens if w.lower() not in stopwords]
+		sans_stopwords = [w for w in tokens if w.lower() not in stopwords]
 		#preserve words in all caps
-		content = [w.lower() if w.isupper() != True else w for w in tokens_final]
+		content = [w.lower() if w.isupper() != True else w for w in sans_stopwords]
 
 		return content
-
-# def negating(input_list):
-# 	for word in input_list:
-# 		if word in 
-
-
-
 
 
 # if __name__ == "__main__":
@@ -50,9 +43,7 @@ def tokenize_text(input_string):
 
 ####TODO####
 #remove ' from negation
-#preserve emoticons
 #think about tweets
-#get rid of numbers, $money, 
 #add negation
 
 		

@@ -1,6 +1,6 @@
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
-from sklearn.cross_validation import ShuffleSplit, KFold
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import classification_report
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -53,12 +53,12 @@ def unpack_review(review):
 
 def create_model():
     tfidf = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False, analyzer = "word")
-    clf = MultinomialNB()
+    clf = BernoulliNB()
     pipleline = Pipeline([('vect', tfidf), ('clf', clf)])
     return pipleline
 
 def train_model(clf, review_data, labels):
-    cross_validation = KFold(len(review_data), n_folds=10, indices=None, shuffle=True, random_state=0)
+    cross_validation = StratifiedKFold(labels, n_folds=10, indices=None, shuffle=True, random_state=0)
     review_s = pd.Series(data=review_data)
     labels_s = pd.Series(data=labels)
 
@@ -66,12 +66,11 @@ def train_model(clf, review_data, labels):
         X_train, y_train = review_s[train], labels_s[train]
         X_test, y_test = review_s[test], labels_s[test]
 
-        classifier = clf
-        classifier.fit(X_train, y_train)
+        clf.fit(X_train, y_train)
 
-    predicted = classifier.predict(X_test)
-    evaluate_model(y_test, predicted)
-    joblib.dump(classifier, "classifier.pickle")
+        predicted = clf.predict(X_test)
+        evaluate_model(y_test, predicted)
+    joblib.dump(clf, "classifier.pickle")
 
 
 def evaluate_model(label_true,label_predicted):
