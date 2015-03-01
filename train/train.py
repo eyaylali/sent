@@ -46,7 +46,7 @@ def unpack_review(review):
     if rating == "1.0" or rating == "2.0":
         label = "very upset"
     elif rating == "3.0":
-        label = "dissatisfied"
+        label = "neutral"
     else:
         label = "positive"
     return all_content, label
@@ -68,9 +68,23 @@ def train_model(clf, review_data, labels):
 
         clf.fit(X_train, y_train)
 
-        predicted = clf.predict(X_test)
+        predicted = predict(clf, X_test)
         evaluate_model(y_test, predicted)
     joblib.dump(clf, "classifier.pickle")
+
+def predict(clf, test_data):
+    predict = clf.predict_proba(test_data)
+    for label_probability_list in predict:
+        neutral = label_probability_list[0]
+        positive = label_probability_list[1]
+        upset = label_probability_list[2]
+
+        if neutral > positive and neutral > upset:
+            if neutral < 50:
+                if neutral - positive < 10:
+                    return ["positive"]
+                elif neutral - upset <10:
+                    return ["upset"]
 
 
 def evaluate_model(label_true,label_predicted):
@@ -81,6 +95,7 @@ def main():
     review_data, labels = parse_files('test-data/*.json')
     clf = create_model()
     train_model(clf, review_data, labels)
+    predict(clf, test_data)
 
 if __name__ == "__main__":
     main()
