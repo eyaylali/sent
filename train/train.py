@@ -76,21 +76,23 @@ def predict(clf, test_data):
     results = []
     predict = clf.predict_proba(test_data)
     for label_probability_list in predict:
-        print label_probability_list
         neutral = label_probability_list[0]
         positive = label_probability_list[1]
         upset = label_probability_list[2]
 
         if neutral > positive and neutral > upset:
-            if neutral < .50:
-                if neutral - positive < .10:
-                    results.append("positive")
-                elif neutral - upset <.10:
-                    results.append("upset")
-                else:
-                    results.append("neutral")
+            if neutral - upset < .10:
+                results.append("very upset")
+            elif neutral - positive < .10:
+                results.append("positive")
             else:
                 results.append("neutral")
+        else:
+            if max(positive, upset) == positive:
+                results.append("positive")
+            else:
+                results.append("very upset")
+    results = np.array(results)
     return results
 
 
