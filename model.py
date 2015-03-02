@@ -42,25 +42,24 @@ class User(Base):
 	role = Column(String(64))
 	name = Column(String(100))
 	email = Column(String(100))
-	organization_id = Column(Integer, ForeignKey('organizations.zendesk_org_id'))
+	organization_name = Column(String, nullable = True)
 
-	organization = relationship("Organization", backref=backref("users", order_by=id))
-
-	def __repr__(self):
-		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
-		pass
-
-class Organization(Base):
-	__tablename__ = "organizations"
-
-	id = Column(Integer, primary_key = True)
-	zendesk_org_id = Column(Integer)
-	name = Column(String(100))
-	tags = Column(PickleType) #list
+	# organization = relationship("Organization", backref=backref("users", order_by=id))
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
 		pass
+
+# class Organization(Base):
+# 	__tablename__ = "organizations"
+
+# 	id = Column(Integer, primary_key = True)
+# 	zendesk_org_id = Column(Integer)
+# 	name = Column(String(100))
+
+# 	def __repr__(self):
+# 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
+# 		pass
 
 ### End class declarations
 

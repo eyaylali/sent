@@ -17,15 +17,21 @@ ORGANIZATIONS = zendesk.organizations_list()
 # load the saved pipeline that includes vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')
 
-def unpack_zendesk_users_tickets(session, dict_input):
-	for user in dict_input["users"]:
+def unpack_zendesk_users_tickets(session, user_dict, org_dict):
+	for user in user_dict["users"]:
 		zendesk_user_id = int(user["id"])
 		role = user["role"]
 		name = user["name"]
 		email = user["email"]
 		organization_id = user["organization_id"]
+		if organization_id:
+			for organization in org_dict["organizations"]:
+				if organization["id"] == organization_id:
+					organization_name = organization["name"]
+		else:
+			organization_name = None
 
-		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email, organization_id = organization_id)
+		user = model.User(zendesk_user_id = zendesk_user_id, role = role, name = name, email = email, organization_name = organization_name)
 		session.add(user)
 		session.commit()
 		session.refresh(user)
@@ -51,23 +57,21 @@ def unpack_zendesk_users_tickets(session, dict_input):
 
 		session.commit()
 
-def unpack_zendesk_organizations(session, dict_input):
-	for organization in dict_input["organizations"]:
-		zendesk_org_id = organization["id"]
-		name = organization["name"]
-		tags = organization["tags"]
+# def unpack_zendesk_organizations(session, dict_input):
+# 	for organization in dict_input["organizations"]:
+# 		zendesk_org_id = organization["id"]
+# 		name = organization["name"]
 
-		organization = model.Organization(zendesk_org_id = zendesk_org_id, name = name, tags = tags)
-		session.add(organization)
-	session.commit()
+# 		organization = model.Organization(zendesk_org_id = zendesk_org_id, name = name, tags = tags)
+# 		session.add(organization)
+# 	session.commit()
 
 def predict_sentiment_label(all_content):
 	label = classifier.predict([all_content])
 	return label[0]
 
 def main(session):
-	unpack_zendesk_organizations(session, ORGANIZATIONS)
-	unpack_zendesk_users_tickets(session, USERS)
+	unpack_zendesk_users_tickets(session, USERS, ORGANIZATIONS)
     
 if __name__ == "__main__":
 	main(session)

@@ -81,9 +81,9 @@ def predict(clf, test_data):
         upset = label_probability_list[2]
 
         if neutral > positive and neutral > upset:
-            if neutral - upset < .10:
+            if neutral - upset < .20:
                 results.append("very upset")
-            elif neutral - positive < .10:
+            elif neutral - positive < .20:
                 results.append("positive")
             else:
                 results.append("neutral")
@@ -101,7 +101,7 @@ def evaluate_model(label_true,label_predicted):
     print "The accuracy score is {:.2%}".format(accuracy_score(label_true,label_predicted))
 
 def main():
-    review_data, labels = parse_files('test-data/*.json')
+    review_data, labels = parse_files('test/*.json')
     clf = create_model()
     train_model(clf, review_data, labels)
 
