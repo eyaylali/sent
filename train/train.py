@@ -101,7 +101,7 @@ def evaluate_model(label_true,label_predicted):
     print "The accuracy score is {:.2%}".format(accuracy_score(label_true,label_predicted))
 
 def main():
-    review_data, labels = parse_files('test/*.json')
+    review_data, labels = parse_files('data/*.json')
     clf = create_model()
     train_model(clf, review_data, labels)
 

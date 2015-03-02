@@ -2,9 +2,12 @@ from flask import Flask, render_template, redirect, request, g, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
 import model
 
+from datetime import datetime
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////sent/sent.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sent.db'
 db = SQLAlchemy(app)
+
 
 class Ticket(db.Model):
 	__tablename__ = "tickets"
@@ -35,22 +38,43 @@ class User(db.Model):
 @app.route('/sent/api/tickets', methods=['GET'])
 def tickets():
   if request.method == 'GET':
-    ticket_results = Ticket.query.limit(20).offset(0).all()
+
+  	# decode URL query string to get python datetime
+    # print datetime.strptime(request.args.get('time'), "%Y-%m-%dT%H:%M:%S.%fZ")
+
+  	# sort by date (MUST BE UNIQUE!)
+  	# use a dict to ensure uniqueness to the microsecond
+
+  	# be able to handle the following three query types:
+  	#   give me the latest tickets, up to 20 
+  	#     new pageload
+  	#     doesnt use any query parameters
+  	#   give me the following tickets, up to 20 
+  	#     click "load more"
+  	#     uses least recent cursor
+  	#   give me any tickets that happened since i loaded the page
+  	#     called by setTimeout()
+  	#     uses most recent cursor
+
+    ticket_results = Ticket.query.order_by('timestamp').limit(20).offset(0).all()
 
     json_results = []
-    for result in results:
-    	d = {'ticket_id': result.ticket_id,
-           'user_id': result.user_id,
-           'user_name': result.user.name,
-           'user_organization': result.user.organization_name,
-           'date': result.timestamp,
-           'subject': result.subject,
-           'content': result.content,
-           'status': result.status,
-           'source': result.source,
-           'sentiment': result.sentiment_label}
+    for result in ticket_results:
+    	d = {
+    		'ticket_id': result.ticket_id,
+			'user_id': result.user_id,
+			'user_name': result.user.name,
+			'user_organization': result.user.organization_name,
+			'date': result.timestamp,
+			'subject': result.subject,
+			'content': result.content,
+			'status': result.status,
+			'source': result.source,
+			'sentiment': result.sentiment_label
+		}
       	json_results.append(d)
-      	print json_results
+      	# print json_results
+
 
     return jsonify(items=json_results)
 
@@ -71,18 +95,13 @@ def ticket(ticket_id):
 
     return jsonify(items=json_result)
 
-# @app.route('/sent/api/v1.0/tickets', methods=['GET'])
-# def get_tasks():
-#     return jsonify({'tasks': tasks})   
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-# @app.route("/dashboard")
-# def index():
-#     return render_template("index.html")
-
-# @app.route("/inbox")
-# def inbox():
-# 	upset_list = model.session.query(model.Ticket).filter_by(sentiment_label = "positive").all()
-# 	return render_template("inbox.html", upset_list = upset_list)
+@app.route("/tickets")
+def inbox():
+	pass
 
 # @app.route("/inbox/<int:page>")
 # def inbox():
