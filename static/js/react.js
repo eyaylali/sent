@@ -34,12 +34,11 @@ var TicketList = React.createClass({
 	    this.loadTicketsFromServer();
 	},
   	render: function() {
-  		console.log(this.state.data)
-    return (
-      <div className="ticketList">
-        <h1>Tickets</h1>
-        <Ticket data={this.state.data} />
-      </div>
+	    return (
+	    	<div className="ticketList">
+	        <h1>Tickets</h1>
+	        <Ticket data={this.state.data} />
+	      	</div>
     );
   }
 });

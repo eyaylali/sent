@@ -7,7 +7,7 @@ from datetime import datetime
 import os
 import sys
 from sklearn.externals import joblib
-import pdb
+from train import train
  
 zendesk = Zendesk("https://sent.zendesk.com", os.environ["EMAIL"], os.environ["PASSWORD"])
 TICKETS = zendesk.tickets_list()
@@ -77,7 +77,7 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 # 	session.commit()
 
 def predict_sentiment_label(all_content):
-	label = classifier.predict([all_content])
+	label = train.predict(classifier, [all_content])
 	return label[0]
 
 def main(session):
