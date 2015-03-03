@@ -35,14 +35,14 @@ class User(db.Model):
 
 @app.route('/sent/api/tickets', methods=['GET'])
 def tickets():
-  if request.method == 'GET':
-  	if request.args.get('time') == False:
-  		ticket_results = Ticket.query.order_by('timestamp').limit(20).offset(0).all()
-  	else:
-	  	# decode URL query string to get python datetime
-	    search_param = datetime.strptime(request.args.get('time'), "%Y-%m-%dT%H:%M:%S.%fZ")
-	    ticket_results = Ticket.query.order_by('timestamp').having('timestamp' > search_param).limit(20).all()
-	    
+	if request.method == 'GET':
+  	# if request.args.get('time') == False:
+  	# 	ticket_results = Ticket.query.order_by('timestamp').limit(20).offset(0).all()
+  	# else:
+	  # 	# decode URL query string to get python datetime
+	  #   search_param = datetime.strptime(request.args.get('time'), "%Y-%m-%dT%H:%M:%S.%fZ")
+	  #   ticket_results = Ticket.query.order_by('timestamp').having('timestamp' > search_param).limit(20).all()
+
   	# sort by date (MUST BE UNIQUE!)
   	# use a dict to ensure uniqueness to the microsecond
 
@@ -58,26 +58,23 @@ def tickets():
   	#     uses most recent cursor
 
  
-
-    json_results = []
-    for result in ticket_results:
-    	d = {
-    		'ticket_id': result.ticket_id,
-			'user_id': result.user_id,
-			'user_name': result.user.name,
-			'user_organization': result.user.organization_name,
-			'date': result.timestamp,
-			'subject': result.subject,
-			'content': result.content,
-			'status': result.status,
-			'source': result.source,
-			'sentiment': result.sentiment_label
-		}
-      	json_results.append(d)
-      	print json_results
-
-
-    return jsonify(items=json_results)
+	  	ticket_results = Ticket.query.order_by('timestamp').limit(20).offset(0).all()
+	  	json_results = []
+	  	for result in ticket_results:
+	  		d = {
+	    		'ticket_id': result.ticket_id,
+				'user_id': result.user_id,
+				'user_name': result.user.name,
+				'user_organization': result.user.organization_name,
+				'date': result.timestamp,
+				'subject': result.subject,
+				'content': result.content,
+				'status': result.status,
+				'source': result.source,
+				'sentiment': result.sentiment_label
+			}
+	      	json_results.append(d)
+	      	return jsonify(items=json_results)
 
 @app.route('/sent/api/tickets/<int:ticket_id>', methods=['GET'])
 def ticket(ticket_id):
@@ -100,9 +97,11 @@ def ticket(ticket_id):
 def index():
     return render_template("index.html")
 
-@app.route("/tickets")
-def inbox():
-	pass
+@app.route("/inbox/<label>", methods=['GET'])
+def show_inbox(label):
+	return render_template("inbox.html")
+
+
 
 # @app.route("/inbox/<int:page>")
 # def inbox():

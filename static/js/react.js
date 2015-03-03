@@ -13,13 +13,37 @@ var Ticket = React.createClass({
 });
 
 var TicketList = React.createClass({
-  render: function() {
-  	rows = [];
+	
+    loadTicketsFromServer: function() {
+        $.ajax({
+            url: this.props.source,
+            dataType: 'json',
+            type: 'get',
+            success: function(data) {
+                this.setState({data: data});
+            }.bind(this),
+            error: function(xhr, status, err) {
+        		console.error(this.props.source, status, err.toString());
+      		}.bind(this)
+        });
+    },
+    getInitialState: function() {
+    	return {data: []};
+  	},
+    componentDidMount: function() {
+	    this.loadTicketsFromServer();
+	},
+  	render: function() {
+  		console.log(this.state.data)
     return (
-    	<table><Ticket /></table>
-    	);
+      <div className="ticketList">
+        <h1>Tickets</h1>
+        <Ticket data={this.state.data} />
+      </div>
+    );
   }
 });
+
 
 var Page = React.createClass({
   render: function() {
@@ -34,6 +58,6 @@ var Page = React.createClass({
 });
 
 React.render(
-  <Page url = '/sent/api/tickets' />,
+  <Page source = '/sent/api/tickets' />,
   document.getElementById('ticket-list')
 );

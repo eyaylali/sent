@@ -8,10 +8,20 @@
     <script src="http://fb.me/react-0.12.2.js"></script>
     <script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
     <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script type = "text/jsx" src="/static/js/react.js"></script>
+    <script type = "text/jsx" src="/static/js/dashboard.js"></script>
   </head>
   <body>
-    <div id="ticket-list"></div>
+    <div id="dashboard">
+    <p>Click here to go to your angry inbox: <form action="/inbox/upset">
+      <input type="submit" value="Click Here">
+    </form></p>
+    <p>Click here to go to your happy inbox:
+    <form action="/inbox/positive">
+      <input type="submit" value="Click Here"></form></p>
+    <p>Click here to go to your neutral inbox:
+    <form action="inbox/neutral">
+      <input type="submit" value="Click Here"></form></p>
+    </div>
   </body>
 </html>
 
