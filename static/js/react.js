@@ -7,6 +7,7 @@ var Ticket = React.createClass({
     		<td>Sentiment</td>
     		<td>Customer Name</td>
     		<td>Subject</td>
+    	</tr>
     	);
   }
 });
@@ -14,7 +15,6 @@ var Ticket = React.createClass({
 var TicketList = React.createClass({
   render: function() {
   	rows = [];
-  	for (row in this.props.data)
     return (
     	<table><Ticket /></table>
     	);
@@ -24,8 +24,10 @@ var TicketList = React.createClass({
 var Page = React.createClass({
   render: function() {
     return (
-    	<div>Hello!</div>
-    	<TicketList />
+    	<div>
+	    	<div>Hello!</div>
+	    	<TicketList />
+    	</div>
     	);
 
   }

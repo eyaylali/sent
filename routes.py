@@ -59,25 +59,25 @@ def tickets():
 
  
 
-  #   json_results = []
-  #   for result in ticket_results:
-  #   	d = {
-  #   		'ticket_id': result.ticket_id,
-		# 	'user_id': result.user_id,
-		# 	'user_name': result.user.name,
-		# 	'user_organization': result.user.organization_name,
-		# 	'date': result.timestamp,
-		# 	'subject': result.subject,
-		# 	'content': result.content,
-		# 	'status': result.status,
-		# 	'source': result.source,
-		# 	'sentiment': result.sentiment_label
-		# }
-  #     	json_results.append(d)
-      	# print json_results
+    json_results = []
+    for result in ticket_results:
+    	d = {
+    		'ticket_id': result.ticket_id,
+			'user_id': result.user_id,
+			'user_name': result.user.name,
+			'user_organization': result.user.organization_name,
+			'date': result.timestamp,
+			'subject': result.subject,
+			'content': result.content,
+			'status': result.status,
+			'source': result.source,
+			'sentiment': result.sentiment_label
+		}
+      	json_results.append(d)
+      	print json_results
 
 
-    # return jsonify(items=json_results)
+    return jsonify(items=json_results)
 
 @app.route('/sent/api/tickets/<int:ticket_id>', methods=['GET'])
 def ticket(ticket_id):
