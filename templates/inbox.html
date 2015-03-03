@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block body %}
+
+
+<title>Inbox</title>
+<table border = "1" style="width:100%">
+	<tr>
+	    <th>Urgency</th>
+	    <th>Name</th> 
+	    <th>Subject</th>
+	</tr>
+{% for ticket in upset_list %}
+  <tr>
+  	<td>{{ ticket.sentiment_label }}</td>
+    <td>{{ ticket.user.name }}</td>
+    <td><a href="https://sent.zendesk.com/agent/tickets/{{ticket.ticket_id}}">{{ ticket.subject }}</a></td> 
+  </tr>
+{% endfor %}
+</table>
+<button id = "loadmore" type="button" onclick="incrementValue()">Load More</button>
+{% endblock %}
+
+
+<!-- <nav>
+  <ul class="pagination pagination-sm">
+    <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+    <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+  </ul>
+</nav> -->
