@@ -4,52 +4,70 @@ var Ticket = React.createClass({
   render: function() {
     return (
     	<tr>
-    		<td>Sentiment</td>
-    		<td>Customer Name</td>
-    		<td>Subject</td>
+    		<td>{this.props.ticket.sentiment}</td>
+    		<td>{this.props.ticket.date}</td>
+    		<td>{this.props.ticket.user_name}</td>
+    		<td>{this.props.ticket.subject}</td>
+    		<td>{this.props.ticket.content}</td>
     	</tr>
     	);
   }
 });
 
 var TicketList = React.createClass({
-	
+	getInitialState: function() {
+    	return {data: [], cursor: ""};
+  	},
     loadTicketsFromServer: function() {
         $.ajax({
-            url: this.props.source,
+            url: this.props.source + "?cursor=" + this.state.cursor,
             dataType: 'json',
             type: 'get',
             success: function(data) {
-                this.setState({data: data});
+            	console.log(data);
+                this.setState({data: data.items, cursor: data});
+
             }.bind(this),
             error: function(xhr, status, err) {
         		console.error(this.props.source, status, err.toString());
       		}.bind(this)
         });
     },
-    getInitialState: function() {
-    	return {data: []};
-  	},
     componentDidMount: function() {
 	    this.loadTicketsFromServer();
+	    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
 	},
   	render: function() {
+  		var tickets = [];
+  		if (this.state.data.length > 0) {
+  			this.state.data.forEach(function(t) {
+				tickets.push(<Ticket ticket={t} />);
+  			});
+  		}
+ 
 	    return (
 	    	<div className="ticketList">
 	        <h1>Tickets</h1>
-	        <Ticket data={this.state.data} />
+	        <table>
+	        	<tr>
+	        		<th>Sentiment</th>
+	        		<th>Date</th>
+	        		<th>Customer Name</th>
+	        		<th>Subject</th>
+	        	</tr>
+	        	{tickets}
+	        </table>
 	      	</div>
     );
   }
 });
 
-
-var Page = React.createClass({
+var InboxPage = React.createClass({
   render: function() {
     return (
-    	<div>
+    	<div className= "container">
 	    	<div>Hello!</div>
-	    	<TicketList />
+	    	<TicketList source = {this.props.source}/>
     	</div>
     	);
 
@@ -57,6 +75,6 @@ var Page = React.createClass({
 });
 
 React.render(
-  <Page source = '/sent/api/tickets' />,
+  <InboxPage source = '/sent/api/tickets' pollInterval={2000}/>,
   document.getElementById('ticket-list')
 );

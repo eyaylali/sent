@@ -36,32 +36,10 @@ class User(db.Model):
 @app.route('/sent/api/tickets', methods=['GET'])
 def tickets():
 	if request.method == 'GET':
-  	# if request.args.get('time') == False:
-  	# 	ticket_results = Ticket.query.order_by('timestamp').limit(20).offset(0).all()
-  	# else:
-	  # 	# decode URL query string to get python datetime
-	  #   search_param = datetime.strptime(request.args.get('time'), "%Y-%m-%dT%H:%M:%S.%fZ")
-	  #   ticket_results = Ticket.query.order_by('timestamp').having('timestamp' > search_param).limit(20).all()
-
-  	# sort by date (MUST BE UNIQUE!)
-  	# use a dict to ensure uniqueness to the microsecond
-
-  	# be able to handle the following three query types:
-  	#   give me the latest tickets, up to 20 
-  	#     new pageload
-  	#     doesnt use any query parameters
-  	#   give me the following tickets, up to 20 
-  	#     click "load more"
-  	#     uses least recent cursor
-  	#   give me any tickets that happened since i loaded the page
-  	#     called by setTimeout()
-  	#     uses most recent cursor
-
- 
 	  	ticket_results = Ticket.query.order_by('timestamp').limit(20).offset(0).all()
 	  	json_results = []
-	  	for result in ticket_results:
-	  		d = {
+    	for result in ticket_results:
+			d = {
 	    		'ticket_id': result.ticket_id,
 				'user_id': result.user_id,
 				'user_name': result.user.name,
@@ -73,23 +51,25 @@ def tickets():
 				'source': result.source,
 				'sentiment': result.sentiment_label
 			}
-	      	json_results.append(d)
-	      	return jsonify(items=json_results)
+			json_results.append(d)
+      	return jsonify(items=json_results)
 
 @app.route('/sent/api/tickets/<int:ticket_id>', methods=['GET'])
 def ticket(ticket_id):
   if request.method == 'GET':
     result = Ticket.query.filter_by(ticket_id=ticket_id).first()
 
-    json_result = {'user_id': result.user_id,
-           'user_name': result.user.name,
-           'user_organization': result.user.organization_name,
-           'date': result.timestamp,
-           'subject': result.subject,
-           'content': result.content,
-           'status': result.status,
-           'source': result.source,
-           'sentiment': result.sentiment_label}
+    json_result = {
+    			'user_id': result.user_id,
+           		'user_name': result.user.name,
+           		'user_organization': result.user.organization_name,
+           		'date': result.timestamp,
+           		'subject': result.subject,
+           		'content': result.content,
+           		'status': result.status,
+           		'source': result.source,
+           		'sentiment': result.sentiment_label
+           		}
 
     return jsonify(items=json_result)
 
