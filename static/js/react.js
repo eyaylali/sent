@@ -20,7 +20,7 @@ var TicketList = React.createClass({
   	},
     loadTicketsFromServer: function() {
         $.ajax({
-            url: this.props.source + "?page=" + this.state.cursor,
+            url: this.props.source + GLOBAL_LABEL+"?page=" + this.state.cursor,
             dataType: 'json',
             type: 'get',
             success: function(data) {
@@ -33,8 +33,15 @@ var TicketList = React.createClass({
       		}.bind(this)
         });
     },
-    handlePagination: function() {
-    	//FILL IN
+    handlePaginationPrevious: function() {
+    	if (this.state.cursor != 1) {
+    		this.state.cursor--;
+    		this.loadTicketsFromServer()};
+    },
+    handlePaginationNext: function() {
+    	if (this.state.data.length == 20) {
+    	this.state.cursor++;
+    	this.loadTicketsFromServer()};
     },
     componentDidMount: function() {
 	    this.loadTicketsFromServer();
@@ -54,19 +61,19 @@ var TicketList = React.createClass({
 	        <h1>Tickets</h1>
 	        <nav>
 				<ul className="pagination">
-				    <li onClick={this.handlePagination}>
+				    <li onClick={this.handlePaginationPrevious}>
 				    	<a href="#" aria-label="Previous">
 				        	<span aria-hidden="true">&laquo;</span>
 				      	</a>
 				    </li>
-				    <li onClick={this.handlePagination}>
+				    <li onClick={this.handlePaginationNext}>
 				      	<a href="#" aria-label="Next">
 				        	<span aria-hidden="true">&raquo;</span>
 				      	</a>
 				    </li>
 				</ul>
 			</nav>
-			Viewing 1-20 of 252
+			<p>Viewing #-# of #</p>
 	        <table className="table">
 	        	<tr>
 	        		<th>Sentiment</th>
@@ -93,6 +100,6 @@ var InboxPage = React.createClass({
 });
 
 React.render(
-  <InboxPage source = '/sent/api/tickets' pollInterval={2000}/>,
+  <InboxPage source = '/sent/api/tickets/' pollInterval={2000}/>,
   document.getElementById('ticket-list')
 );

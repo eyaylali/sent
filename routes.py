@@ -33,8 +33,8 @@ class User(db.Model):
 	email = db.Column(db.String(100))
 	organization_name = db.Column(db.String, nullable = True)
 
-@app.route('/sent/api/tickets', methods=['GET'])
-def tickets():
+@app.route('/sent/api/tickets/<label>/', methods=['GET'])
+def tickets(label):
 	if request.method == 'GET':
 		page = int(request.args.get('page'))
 		display_qty = 20
@@ -55,8 +55,8 @@ def tickets():
 				'sentiment': result.sentiment_label
 			}
 			json_results.append(d)
-		message_count = page + 1
-		return jsonify(items=json_results, cursor = message_count)
+		# message_count = page + 1
+		return jsonify(items=json_results, cursor = page)
 
 @app.route("/")
 def index():
@@ -64,15 +64,8 @@ def index():
 
 @app.route("/inbox/<label>", methods=['GET'])
 def show_inbox(label):
-	return render_template("inbox.html")
+	return render_template("inbox.html", label = label)
 
-
-
-# @app.route("/inbox/<int:page>")
-# def inbox():
-# 	offset = (page-1) * PER_PAGE
-# 	user_list = model.session.query(model.User).limit(PER_PAGE).offset(offset)
-# 	return render_template("user_list.html", users=user_list, page_num=page)
 
 
 if __name__ == "__main__":
