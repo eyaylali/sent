@@ -8,7 +8,6 @@ var Ticket = React.createClass({
     		<td>{this.props.ticket.date}</td>
     		<td>{this.props.ticket.user_name}</td>
     		<td>{this.props.ticket.subject}</td>
-    		<td>{this.props.ticket.content}</td>
     	</tr>
     	);
   }
@@ -16,16 +15,16 @@ var Ticket = React.createClass({
 
 var TicketList = React.createClass({
 	getInitialState: function() {
-    	return {data: [], cursor: ""};
+    	return {data: [], cursor: "1"};
   	},
     loadTicketsFromServer: function() {
         $.ajax({
-            url: this.props.source + "?cursor=" + this.state.cursor,
+            url: this.props.source + "?page=" + this.state.cursor,
             dataType: 'json',
             type: 'get',
             success: function(data) {
             	console.log(data);
-                this.setState({data: data.items, cursor: data});
+                this.setState({data: data.items, cursor: data.cursor});
 
             }.bind(this),
             error: function(xhr, status, err) {
@@ -37,6 +36,7 @@ var TicketList = React.createClass({
 	    this.loadTicketsFromServer();
 	    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
 	},
+
   	render: function() {
   		var tickets = [];
   		if (this.state.data.length > 0) {
@@ -48,7 +48,7 @@ var TicketList = React.createClass({
 	    return (
 	    	<div className="ticketList">
 	        <h1>Tickets</h1>
-	        <table>
+	        <table class="table">
 	        	<tr>
 	        		<th>Sentiment</th>
 	        		<th>Date</th>

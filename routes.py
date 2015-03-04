@@ -36,9 +36,12 @@ class User(db.Model):
 @app.route('/sent/api/tickets', methods=['GET'])
 def tickets():
 	if request.method == 'GET':
-	  	ticket_results = Ticket.query.order_by('timestamp').limit(20).offset(0).all()
+		page = int(request.args.get('page'))
+		display_qty = 20
+	  		
+	 	ticket_results = Ticket.query.order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(display_qty).all()
 	  	json_results = []
-    	for result in ticket_results:
+		for result in ticket_results:
 			d = {
 	    		'ticket_id': result.ticket_id,
 				'user_id': result.user_id,
@@ -52,26 +55,8 @@ def tickets():
 				'sentiment': result.sentiment_label
 			}
 			json_results.append(d)
-      	return jsonify(items=json_results)
-
-@app.route('/sent/api/tickets/<int:ticket_id>', methods=['GET'])
-def ticket(ticket_id):
-  if request.method == 'GET':
-    result = Ticket.query.filter_by(ticket_id=ticket_id).first()
-
-    json_result = {
-    			'user_id': result.user_id,
-           		'user_name': result.user.name,
-           		'user_organization': result.user.organization_name,
-           		'date': result.timestamp,
-           		'subject': result.subject,
-           		'content': result.content,
-           		'status': result.status,
-           		'source': result.source,
-           		'sentiment': result.sentiment_label
-           		}
-
-    return jsonify(items=json_result)
+		message_count = page + 1
+		return jsonify(items=json_results, cursor = message_count)
 
 @app.route("/")
 def index():
