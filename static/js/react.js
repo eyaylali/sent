@@ -2,12 +2,13 @@
 
 var Ticket = React.createClass({
   render: function() {
+  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
     return (
     	<tr>
     		<td>{this.props.ticket.sentiment}</td>
-    		<td>{this.props.ticket.date}</td>
     		<td>{this.props.ticket.user_name}</td>
     		<td>{this.props.ticket.subject}</td>
+    		<td>{this.props.ticket.date}</td>
     	</tr>
     	);
   }
@@ -32,6 +33,9 @@ var TicketList = React.createClass({
       		}.bind(this)
         });
     },
+    handlePagination: function() {
+    	//FILL IN
+    },
     componentDidMount: function() {
 	    this.loadTicketsFromServer();
 	    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
@@ -48,12 +52,27 @@ var TicketList = React.createClass({
 	    return (
 	    	<div className="ticketList">
 	        <h1>Tickets</h1>
-	        <table class="table">
+	        <nav>
+				<ul className="pagination">
+				    <li onClick={this.handlePagination}>
+				    	<a href="#" aria-label="Previous">
+				        	<span aria-hidden="true">&laquo;</span>
+				      	</a>
+				    </li>
+				    <li onClick={this.handlePagination}>
+				      	<a href="#" aria-label="Next">
+				        	<span aria-hidden="true">&raquo;</span>
+				      	</a>
+				    </li>
+				</ul>
+			</nav>
+			Viewing 1-20 of 252
+	        <table className="table">
 	        	<tr>
 	        		<th>Sentiment</th>
-	        		<th>Date</th>
 	        		<th>Customer Name</th>
 	        		<th>Subject</th>
+	        		<th>Date</th>
 	        	</tr>
 	        	{tickets}
 	        </table>
@@ -66,7 +85,6 @@ var InboxPage = React.createClass({
   render: function() {
     return (
     	<div className= "container">
-	    	<div>Hello!</div>
 	    	<TicketList source = {this.props.source}/>
     	</div>
     	);
