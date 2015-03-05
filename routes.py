@@ -38,10 +38,18 @@ def tickets(label):
 	if request.method == 'GET':
 		page = int(request.args.get('page'))
 		display_qty = 20
-	  		
-	 	ticket_results = Ticket.query.order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(display_qty).all()
+		query_qty = 21 
+
+	 	ticket_results = Ticket.query.filter(Ticket.sentiment_label == label).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
+	 	
+	 	#to check to see if we will need another paginated page after this page
+	 	if len(ticket_results) > 20:
+	 		next_page = 1
+	 	else:
+	 		next_page = 0
+
 	  	json_results = []
-		for result in ticket_results:
+		for result in ticket_results[0:20]:
 			d = {
 	    		'ticket_id': result.ticket_id,
 				'user_id': result.user_id,
@@ -55,8 +63,9 @@ def tickets(label):
 				'sentiment': result.sentiment_label
 			}
 			json_results.append(d)
-		# message_count = page + 1
-		return jsonify(items=json_results, cursor = page)
+		cursor = page
+		total_message_count = Ticket.query.filter(Ticket.sentiment_label == label).count()	
+		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count)
 
 @app.route("/")
 def index():
