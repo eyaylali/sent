@@ -1,7 +1,8 @@
 from flask import Flask, render_template, redirect, request, g, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 import model
-from datetime import datetime
+from datetime import datetime, date
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sent.db'
@@ -35,12 +36,12 @@ class User(db.Model):
 
 @app.route('/sent/api/tickets/<label>/', methods=['GET'])
 def tickets(label):
-	if request.method == 'GET':
+	if request.method == 'GET':	
 		page = int(request.args.get('page'))
 		display_qty = 20
 		query_qty = 21 
 
-	 	ticket_results = Ticket.query.filter(Ticket.sentiment_label == label).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
+	 	ticket_results = Ticket.query.filter(Ticket.sentiment_label == label).order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
 	 	
 	 	#to check to see if we will need another paginated page after this page
 	 	if len(ticket_results) > 20:
@@ -67,6 +68,35 @@ def tickets(label):
 		total_message_count = Ticket.query.filter(Ticket.sentiment_label == label).count()	
 		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count)
 
+
+@app.route('/sent/api/data/', methods=['GET'])
+def counts():
+	#conditional if time is undefined?
+	time_period = request.args.get('time')
+	if time_period != True:
+		time_period = "today"
+	today = date.today()
+	this_month = today.month #the month of today
+	this_week = today.isocalendar()[1] #the week number (in a year)
+	this_day_of_week = today.isocalendar()[2] #day of the week
+
+
+	if time_period == "today":
+		labels = ["positive", "upset", "neutral"]
+		json_count_results = []
+		for label in labels:
+			# count = {label : Ticket.query.filter_by(Ticket.sentiment_label == label, Ticket.week == this_week).count()}
+			count = {label : Ticket.query.filter(Ticket.sentiment_label == label).count()}
+			json_count_results.append(count)
+	elif time_period == "this-week":
+		pass
+	elif time_period == "this-month":
+		pass
+
+	return jsonify(counts=json_count_results)
+
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -78,4 +108,4 @@ def show_inbox(label):
 
 
 if __name__ == "__main__":
-    app.run(port = 7000, debug = True)
+    app.run(port = 5000, debug = True)

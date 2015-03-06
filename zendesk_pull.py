@@ -3,7 +3,7 @@ from tokenizer import tokenize_text
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 import model
 from model import Ticket, User, session
-from datetime import datetime
+from datetime import datetime, date
 import os
 import sys
 from sklearn.externals import joblib
@@ -51,6 +51,9 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 				else:
 					priority = 2
 				timestamp = datetime.strptime(ticket["created_at"], "%Y-%m-%dT%H:%M:%SZ")
+				month = timestamp.month
+				week = timestamp.isocalendar()[1]
+				day_of_week = timestamp.isocalendar()[2]
 				ticket_id = int(ticket["id"])
 				url = ticket["url"]
 				status = ticket["status"]
@@ -61,6 +64,9 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 									  submitter_id = submitter_id, 
 									  assignee_id = assignee_id, 
 									  timestamp = timestamp, 
+									  month = month,
+									  week = week,
+									  day_of_week = day_of_week,
 									  subject = subject, 
 									  content = content, 
 									  status = status, 

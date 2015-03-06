@@ -12,7 +12,7 @@
 var SentimentCounter = React.createClass({
   render: function() {
     return (
-      <div className= "counter">
+      <div className= "boxed" id = "counter">
       {this.props.count}
       </div>
       );
@@ -57,20 +57,6 @@ var SentimentCounterList = React.createClass({
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var Dashboard = React.createClass({
   render: function() {
     return (
@@ -94,7 +80,7 @@ var Dashboard = React.createClass({
 
 
 React.render(
-  <Dashboard source = '/sent/api/tickets/' />,
+  <Dashboard source = '/sent/api/data/' />,
   document.getElementById('analytics-dashboard')
 );
 
