@@ -44,7 +44,7 @@ def unpack_review(review):
     all_content= title +" "+ review_content
 
     if rating == "1.0" or rating == "2.0":
-        label = "very upset"
+        label = "upset"
     elif rating == "3.0":
         label = "neutral"
     else:
@@ -82,7 +82,7 @@ def predict(clf, test_data):
 
         if neutral > positive and neutral > upset:
             if neutral - upset < .20:
-                results.append("very upset")
+                results.append("upset")
             elif neutral - positive < .20:
                 results.append("positive")
             else:
@@ -91,7 +91,7 @@ def predict(clf, test_data):
             if max(positive, upset) == positive:
                 results.append("positive")
             else:
-                results.append("very upset")
+                results.append("upset")
     results = np.array(results)
     return results
 
@@ -101,7 +101,7 @@ def evaluate_model(label_true,label_predicted):
     print "The accuracy score is {:.2%}".format(accuracy_score(label_true,label_predicted))
 
 def main():
-    review_data, labels = parse_files('data/*.json')
+    review_data, labels = parse_files('test-data/*.json')
     clf = create_model()
     train_model(clf, review_data, labels)
 

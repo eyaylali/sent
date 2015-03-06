@@ -1,57 +1,100 @@
 /** @jsx React.DOM */
 
-// var Ticket = React.createClass({
+
+// var SentimentGraph = React.createClass({
 //   render: function() {
 //     return (
-//     	<tr>
-//     		<td>Sentiment</td>
-//     		<td>Customer Name</td>
-//     		<td>Subject</td>
-//     	</tr>
-//     	);
+      
+//      );
 //   }
 // });
 
-// var TicketList = React.createClass({
-//   render: function() {
-//   	rows = [];
-//     return (
-//     	<table><Ticket /></table>
-//     	);
-//   }
-// });
-
-// var Page = React.createClass({
-//   render: function() {
-//     return (
-//     	<div>
-// 	    	<div>Hello!</div>
-// 	    	<TicketList />
-//     	</div>
-//     	);
-
-//   }
-// });
-
-// React.render(
-//   <Page url = '/sent/api/tickets' />,
-//   document.getElementById('ticket-list')
-// );
-
-var chart = c3.generate({
-    bindto: '#chart',
-    data: {
-      columns: [
-        ['data1', 30, 200, 100, 400, 150, 250],
-        ['data2', 50, 20, 10, 40, 15, 25]
-      ],
-      axes: {
-        data2: 'y2' // ADD
-      }
-    },
-    axis: {
-      y2: {
-        show: true // ADD
-      }
-    }
+var SentimentCounter = React.createClass({
+  render: function() {
+    return (
+      <div className= "counter">
+      {this.props.count}
+      </div>
+      );
+  }
 });
+
+var SentimentCounterList = React.createClass({
+  getInitialState: function() {
+    return {data: [], cursor: "today"};
+  },
+  loadCountsFromServer: function() {
+      $.ajax({
+          url: this.props.source + "?time=" + this.state.cursor,
+          dataType: 'json',
+          type: 'get',
+          success: function(data) {
+            console.log(data);
+              this.setState({data: data.counts, cursor: data.cursor});
+          }.bind(this),
+          error: function(xhr, status, err) {
+          console.error(this.props.source, status, err.toString());
+        }.bind(this)
+      });
+  },
+  componentDidMount: function() {
+    this.loadCountsFromServer();
+    setInterval(this.loadCountsFromServer, this.props.pollInterval);
+  },
+  render: function() {
+    var counts = [];
+    console.log(this.state.data.length)
+    if (this.state.data.length > 0) {
+      this.state.data.forEach(function(c) {
+      counts.push(<SentimentCounter count={c} />);
+      });
+    };
+    return (
+      <div className="counterList">
+      {counts}
+      </div>
+    );
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var Dashboard = React.createClass({
+  render: function() {
+    return (
+      <div className= "container">
+      <div className="dropdown">
+        <button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+        Date Range <span className="caret"></span>
+        </button>
+        <ul className="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+          <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">Today</a></li>
+          <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">This Week</a></li>
+          <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">This Month</a></li>
+        </ul>
+      </div>
+      <SentimentCounterList source = {this.props.source}/>
+      </div>
+    	);
+  }
+});
+
+
+
+React.render(
+  <Dashboard source = '/sent/api/tickets/' />,
+  document.getElementById('analytics-dashboard')
+);
+

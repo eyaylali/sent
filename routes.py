@@ -71,11 +71,11 @@ def tickets(label):
 def index():
     return render_template("index.html")
 
-@app.route("/inbox/<label>", methods=['GET'])
+@app.route("/inbox/<label>")
 def show_inbox(label):
 	return render_template("inbox.html", label = label)
 
 
 
 if __name__ == "__main__":
-    app.run(port = 8000, debug = True)
+    app.run(port = 7000, debug = True)

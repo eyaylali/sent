@@ -43,11 +43,10 @@ var TicketList = React.createClass({
   	},
     loadTicketsFromServer: function() {
         $.ajax({
-            url: this.props.source + GLOBAL_LABEL+"?page=" + this.state.cursor,
+            url: this.props.source + sentiment +"?page=" + this.state.cursor,
             dataType: 'json',
             type: 'get',
             success: function(data) {
-            	console.log(data);
                 this.setState({data: data.items, cursor: data.cursor, next_page: data.next_page, total_count: data.total_count});
 
             }.bind(this),
@@ -73,10 +72,11 @@ var TicketList = React.createClass({
 
   	render: function() {
   		var tickets = [];
+  		i = 1
   		if (this.state.data.length > 0) {
   			this.state.data.forEach(function(t) {
-				tickets.push(<Ticket ticket={t} />);
-				tickets.push(<TicketAccordion ticket={t} />);
+				tickets.push(<Ticket key = {i++} ticket={t}/>);
+				tickets.push(<TicketAccordion key = {i++} ticket={t} />);
   			});
   		};
   		var display_start = ((this.state.cursor-1) * 20) + 1;
@@ -127,7 +127,7 @@ var InboxPage = React.createClass({
 
   }
 });
-
+var sentiment = $("#ticket-list").attr("data-sentiment");
 React.render(
   <InboxPage source = '/sent/api/tickets/' pollInterval={2000}/>,
   document.getElementById('ticket-list')

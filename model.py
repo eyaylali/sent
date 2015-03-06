@@ -26,6 +26,7 @@ class Ticket(Base):
 	status = Column(String(64))
 	url = Column(String(300))
 	source = Column(String(64))
+	priority = Column(Integer)
 	sentiment_label = Column(String(64))
 
 	user = relationship("User", backref=backref("tickets", order_by=id))
@@ -64,7 +65,7 @@ class User(Base):
 ### End class declarations
 
 def main():
-	#Base.metadata.create_all(bind=ENGINE)
+	Base.metadata.create_all(bind=ENGINE)
 	pass
 	
 

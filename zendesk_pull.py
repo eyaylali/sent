@@ -46,6 +46,10 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 				submitter_id = int(ticket["submitter_id"])
 				assignee_id = int(ticket["assignee_id"])
 				source = ticket["via"]["channel"]
+				if source == "twitter":
+					priority = 1
+				else:
+					priority = 2
 				timestamp = datetime.strptime(ticket["created_at"], "%Y-%m-%dT%H:%M:%SZ")
 				ticket_id = int(ticket["id"])
 				url = ticket["url"]
@@ -61,7 +65,8 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 									  content = content, 
 									  status = status, 
 									  url = url, 
-									  source = source, 
+									  source = source,
+									  priority = priority, 
 									  sentiment_label = label)
 				session.add(ticket)
 
