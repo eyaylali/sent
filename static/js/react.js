@@ -21,6 +21,12 @@ var Ticket = React.createClass({
 	showHideAccordion: function () {
 		$('#accordion_row_' + this.props.ticket.ticket_id).toggle();
 	},
+	updateSentiment: function () {
+
+	},
+	// $.get('/changeSentiment', funtion(){
+	// 	this.props.updateMe();
+	// })
   	render: function() {
 	  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
 	  	var date = moment(this.props.date)
@@ -42,13 +48,13 @@ var TicketList = React.createClass({
     	return {data: [], cursor: "1"};
   	},
     loadTicketsFromServer: function() {
+    	alert("LOADING");
         $.ajax({
-            url: this.props.source + sentiment +"?page=" + this.state.cursor,
+            url: this.props.source + this.props.sentimentType +"?page=" + this.state.cursor,
             dataType: 'json',
             type: 'get',
             success: function(data) {
                 this.setState({data: data.items, cursor: data.cursor, next_page: data.next_page, total_count: data.total_count});
-
             }.bind(this),
             error: function(xhr, status, err) {
         		console.error(this.props.source, status, err.toString());
@@ -67,15 +73,17 @@ var TicketList = React.createClass({
     },
     componentDidMount: function() {
 	    this.loadTicketsFromServer();
-	    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+	    setInterval(this.loadTicketsFromServer, this.props.pollInterval);
+  	},
+    componentWillUpdate: function() {
+	    this.loadTicketsFromServer();
 	},
-
   	render: function() {
   		var tickets = [];
   		i = 1
   		if (this.state.data.length > 0) {
   			this.state.data.forEach(function(t) {
-				tickets.push(<Ticket key = {i++} ticket={t}/>);
+				tickets.push(<Ticket key = {i++} ticket={t} />);
 				tickets.push(<TicketAccordion key = {i++} ticket={t} />);
   			});
   		};
@@ -118,10 +126,35 @@ var TicketList = React.createClass({
 });
 
 var InboxPage = React.createClass({
-  render: function() {
+	getInitialState: function() {
+		return {
+			sentimentType: this.props.sentiment
+		};
+		
+	},
+	handleSentimentStateChange: function (newSentiment) {
+		this.setState({sentimentType: newSentiment});
+	},
+  	render: function() {
     return (
     	<div className= "container">
-	    	<TicketList source = {this.props.source}/>
+			<ul className="list-group">
+			  <li onClick={this.handleSentimentStateChange.bind(null,"upset")} className="list-group-item">
+			    <span className="badge">14</span>
+			    Upset
+			  </li>
+			  <li onClick={this.handleSentimentStateChange.bind(null,"neutral")} className="list-group-item">
+			    <span className="badge">14</span>
+			    Neutral
+			  </li>
+			  <li onClick={this.handleSentimentStateChange.bind(null,"positive")} className="list-group-item">
+			    <span className="badge">14</span>
+			    Positive
+			  </li>
+			</ul>
+	    	<div>
+		    	<TicketList sentimentType={this.state.sentimentType} source = {this.props.source}/>
+	    	</div>
     	</div>
     	);
 
@@ -129,6 +162,6 @@ var InboxPage = React.createClass({
 });
 var sentiment = $("#ticket-list").attr("data-sentiment");
 React.render(
-  <InboxPage source = '/sent/api/tickets/' pollInterval={2000}/>,
+  <InboxPage sentiment = {sentiment} source = '/sent/api/tickets/' pollInterval={20000}/>,
   document.getElementById('ticket-list')
 );

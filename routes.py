@@ -1,8 +1,8 @@
 from flask import Flask, render_template, redirect, request, g, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 import model
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sent.db'
@@ -71,30 +71,30 @@ def tickets(label):
 
 @app.route('/sent/api/data/', methods=['GET'])
 def counts():
-	#conditional if time is undefined?
+
 	time_period = request.args.get('time')
-	if time_period != True:
-		time_period = "today"
-	today = date.today()
-	this_month = today.month #the month of today
-	this_week = today.isocalendar()[1] #the week number (in a year)
-	this_day_of_week = today.isocalendar()[2] #day of the week
-
-
+	
+	today = datetime.now()
+	last_day = datetime.now() - timedelta(hours = 24)
+	last_week = datetime.now() - timedelta(days = 7)
+	last_month = datetime.now() - timedelta(days = 30)
+	
+	labels = ["upset", "neutral", "positive"]
+	json_count_results = []
 	if time_period == "today":
-		labels = ["positive", "upset", "neutral"]
-		json_count_results = []
 		for label in labels:
-			# count = {label : Ticket.query.filter_by(Ticket.sentiment_label == label, Ticket.week == this_week).count()}
-			count = {label : Ticket.query.filter(Ticket.sentiment_label == label).count()}
+			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_day).count()}
 			json_count_results.append(count)
-	elif time_period == "this-week":
-		pass
-	elif time_period == "this-month":
-		pass
+	elif time_period == "week":
+		for label in labels:
+			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count()}
+			json_count_results.append(count)
+	elif time_period == "month":
+		for label in labels:
+			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}
+			json_count_results.append(count)
 
 	return jsonify(counts=json_count_results)
-
 
 
 @app.route("/")

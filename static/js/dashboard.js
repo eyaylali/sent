@@ -12,8 +12,8 @@
 var SentimentCounter = React.createClass({
   render: function() {
     return (
-      <div className= "boxed" id = "counter">
-      {this.props.count}
+      <div className= "box" id = "counter">
+        <p>{this.props.sentimentCount.count}</p>
       </div>
       );
   }
@@ -21,7 +21,7 @@ var SentimentCounter = React.createClass({
 
 var SentimentCounterList = React.createClass({
   getInitialState: function() {
-    return {data: [], cursor: "today"};
+    return {data: [], cursor: this.props.timePeriod};
   },
   loadCountsFromServer: function() {
       $.ajax({
@@ -30,7 +30,7 @@ var SentimentCounterList = React.createClass({
           type: 'get',
           success: function(data) {
             console.log(data);
-              this.setState({data: data.counts, cursor: data.cursor});
+              this.setState({data: data.counts});
           }.bind(this),
           error: function(xhr, status, err) {
           console.error(this.props.source, status, err.toString());
@@ -39,14 +39,13 @@ var SentimentCounterList = React.createClass({
   },
   componentDidMount: function() {
     this.loadCountsFromServer();
-    setInterval(this.loadCountsFromServer, this.props.pollInterval);
+    setInterval(this.loadCountsFromServer this.props.pollInterval);
   },
   render: function() {
     var counts = [];
-    console.log(this.state.data.length)
     if (this.state.data.length > 0) {
       this.state.data.forEach(function(c) {
-      counts.push(<SentimentCounter count={c} />);
+      counts.push(<SentimentCounter sentimentCount={c} />);
       });
     };
     return (
@@ -58,6 +57,15 @@ var SentimentCounterList = React.createClass({
 });
 
 var Dashboard = React.createClass({
+  getInitialState: function() {
+    return {
+      timePeriod: "today"
+    };
+    
+  },
+  handleTimeChange: function (period) {
+    this.setState({timePeriod: period});
+  },
   render: function() {
     return (
       <div className= "container">
@@ -66,21 +74,20 @@ var Dashboard = React.createClass({
         Date Range <span className="caret"></span>
         </button>
         <ul className="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-          <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">Today</a></li>
-          <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">This Week</a></li>
-          <li role="presentation"><a role="menuitem" tabIndex="-1" href="#">This Month</a></li>
+          <li onClick={this.handleTimeChange.bind(null,"today")} role="presentation"><a role="menuitem" tabIndex="-1">Today</a></li>
+          <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation"><a role="menuitem" tabIndex="-1">Past Week</a></li>
+          <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation"><a role="menuitem" tabIndex="-1">Past Month</a></li>
         </ul>
       </div>
-      <SentimentCounterList source = {this.props.source}/>
+      <SentimentCounterList timePeriod={this.state.timePeriod} source = {this.props.source}/>
       </div>
     	);
   }
 });
 
 
-
 React.render(
-  <Dashboard source = '/sent/api/data/' />,
+  <Dashboard source = '/sent/api/data/'pollInterval={20000} />,
   document.getElementById('analytics-dashboard')
 );
 
