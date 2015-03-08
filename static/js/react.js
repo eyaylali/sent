@@ -73,7 +73,6 @@ var TicketList = React.createClass({
     },
     componentDidMount: function() {
 	    this.loadTicketsFromServer();
-	    setInterval(this.loadTicketsFromServer, this.props.pollInterval);
   	},
     componentWillUpdate: function() {
 	    this.loadTicketsFromServer();
@@ -162,6 +161,6 @@ var InboxPage = React.createClass({
 });
 var sentiment = $("#ticket-list").attr("data-sentiment");
 React.render(
-  <InboxPage sentiment = {sentiment} source = '/sent/api/tickets/' pollInterval={20000}/>,
+  <InboxPage sentiment = {sentiment} source = '/sent/api/tickets/' />,
   document.getElementById('ticket-list')
 );

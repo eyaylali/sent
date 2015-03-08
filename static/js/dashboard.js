@@ -30,7 +30,7 @@ var SentimentCounterList = React.createClass({
           type: 'get',
           success: function(data) {
             console.log(data);
-              this.setState({data: data.counts});
+              this.setState({data: data.counts, cursor: data.cursor});
           }.bind(this),
           error: function(xhr, status, err) {
           console.error(this.props.source, status, err.toString());
@@ -39,7 +39,9 @@ var SentimentCounterList = React.createClass({
   },
   componentDidMount: function() {
     this.loadCountsFromServer();
-    setInterval(this.loadCountsFromServer this.props.pollInterval);
+  },
+  componentWillUpdate: function() {
+      this.loadCountsFromServer();
   },
   render: function() {
     var counts = [];
@@ -61,7 +63,6 @@ var Dashboard = React.createClass({
     return {
       timePeriod: "today"
     };
-    
   },
   handleTimeChange: function (period) {
     this.setState({timePeriod: period});
@@ -87,7 +88,7 @@ var Dashboard = React.createClass({
 
 
 React.render(
-  <Dashboard source = '/sent/api/data/'pollInterval={20000} />,
+  <Dashboard source = '/sent/api/data/'/>,
   document.getElementById('analytics-dashboard')
 );
 
