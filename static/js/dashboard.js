@@ -4,7 +4,6 @@
 // var SentimentGraph = React.createClass({
 //   render: function() {
 //     return (
-      
 //      );
 //   }
 // });
@@ -40,9 +39,11 @@ var SentimentCounterList = React.createClass({
   componentDidMount: function() {
     this.loadCountsFromServer();
   },
-  componentWillUpdate: function() {
-      this.loadCountsFromServer();
-  },
+  componentDidUpdate: function (prevProps, prevState) {
+      if (prevProps.timePeriod !== this.props.timePeriod) {
+      this.loadTicketsFromServer();
+    } 
+    },
   render: function() {
     var counts = [];
     if (this.state.data.length > 0) {
@@ -70,16 +71,11 @@ var Dashboard = React.createClass({
   render: function() {
     return (
       <div className= "container">
-      <div className="dropdown">
-        <button className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-        Date Range <span className="caret"></span>
-        </button>
-        <ul className="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-          <li onClick={this.handleTimeChange.bind(null,"today")} role="presentation"><a role="menuitem" tabIndex="-1">Today</a></li>
-          <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation"><a role="menuitem" tabIndex="-1">Past Week</a></li>
-          <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation"><a role="menuitem" tabIndex="-1">Past Month</a></li>
-        </ul>
-      </div>
+      <ul className="nav nav-tabs">
+        <li onClick={this.handleTimeChange.bind(null,"today")} role="presentation" className="active"><a href="#">Today</a></li>
+        <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation"><a href="#">Last Week</a></li>
+        <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation"><a href="#">Last Month</a></li>
+      </ul>
       <SentimentCounterList timePeriod={this.state.timePeriod} source = {this.props.source}/>
       </div>
     	);

@@ -48,7 +48,6 @@ var TicketList = React.createClass({
     	return {data: [], cursor: "1"};
   	},
     loadTicketsFromServer: function() {
-    	alert("LOADING");
         $.ajax({
             url: this.props.source + this.props.sentimentType +"?page=" + this.state.cursor,
             dataType: 'json',
@@ -74,9 +73,11 @@ var TicketList = React.createClass({
     componentDidMount: function() {
 	    this.loadTicketsFromServer();
   	},
-    componentWillUpdate: function() {
-	    this.loadTicketsFromServer();
-	},
+  	componentDidUpdate: function (prevProps, prevState) {
+  	     if (prevProps.sentimentType !== this.props.sentimentType) {
+			this.loadTicketsFromServer();
+		} 
+  	},
   	render: function() {
   		var tickets = [];
   		i = 1

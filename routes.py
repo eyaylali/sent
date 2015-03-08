@@ -65,7 +65,8 @@ def tickets(label):
 			}
 			json_results.append(d)
 		cursor = page
-		total_message_count = Ticket.query.filter(Ticket.sentiment_label == label).count()	
+		total_message_count = []
+		Ticket.query.filter(Ticket.sentiment_label == label).count()	
 		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count)
 
 
@@ -94,7 +95,7 @@ def counts():
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}
 			json_count_results.append(count)
 
-	return jsonify(counts=json_count_results)
+	return jsonify(counts=json_count_results, cursor = time_period)
 
 
 @app.route("/")
@@ -108,4 +109,4 @@ def show_inbox(label):
 
 
 if __name__ == "__main__":
-    app.run(port = 5000, debug = True)
+    app.run(port = 10000, debug = True)
