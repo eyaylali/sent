@@ -34,6 +34,10 @@ class User(db.Model):
 	email = db.Column(db.String(100))
 	organization_name = db.Column(db.String, nullable = True)
 
+@app.route('/sent/api/tickets/', methods=['POST'])
+def update_ticket_sentiment(data):
+	pass
+
 @app.route('/sent/api/tickets/<label>/', methods=['GET'])
 def tickets(label):
 	if request.method == 'GET':	
@@ -45,9 +49,9 @@ def tickets(label):
 	 	
 	 	#to check to see if we will need another paginated page after this page
 	 	if len(ticket_results) > 20:
-	 		next_page = 1
+	 		next_page = True
 	 	else:
-	 		next_page = 0
+	 		next_page = False
 
 	  	json_results = []
 	 	cursor = page

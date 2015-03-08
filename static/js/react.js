@@ -4,23 +4,15 @@ var TicketAccordion = React.createClass({
   render: function() {
 //  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
 //  	var date = moment(this.props.date)
-  	var ticketId = "accordion_row_" + this.props.ticket.ticket_id;
-	var divStyle = {
-	  color: 'black',
-	  display: 'none'
-	};
     return (
-    	<tr style={divStyle} className="warning" id={ticketId}>
-    		<td colSpan="4">{this.props.ticket.content}</td>
+    	<tr className="warning">
+    		<td colSpan="5">{this.props.ticket.content}</td>
     	</tr>
     	);
   }
 });
 
 var Ticket = React.createClass({
-	showHideAccordion: function () {
-		$('#accordion_row_' + this.props.ticket.ticket_id).toggle();
-	},
 	updateSentiment: function () {
 
 	},
@@ -33,10 +25,11 @@ var Ticket = React.createClass({
 	  	var ticketId = "ticket_row_" + this.props.ticket.ticket_id;
 	  	var ticketAccordionId = "accordion_row_" + this.props.ticket.ticket_id;
 	    return (
-	    	<tr className="active" id={ticketId} onClick={this.showHideAccordion}>
+	    	<tr className="active" id={ticketId} >
+	  			<td><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
 	    		<td>{this.props.ticket.sentiment}</td>
 	    		<td>{this.props.ticket.user_name}</td>
-	    		<td>{this.props.ticket.subject}</td>
+	    		<td onClick={this.props.handleAccordions}>{this.props.ticket.subject}</td>
 	    		<td>{this.props.ticket.date}</td>
 	    	</tr>
 	    	);
@@ -44,71 +37,60 @@ var Ticket = React.createClass({
 });
 
 var TicketList = React.createClass({
-	getInitialState: function() {
-    	return {data: [], cursor: "1"};
-  	},
-    loadTicketsFromServer: function() {
-        $.ajax({
-            url: this.props.source + this.props.sentimentType +"?page=" + this.state.cursor,
-            dataType: 'json',
-            type: 'get',
-            success: function(data) {
-                this.setState({data: data.items, cursor: data.cursor, next_page: data.next_page, total_count: data.total_count});
-            }.bind(this),
-            error: function(xhr, status, err) {
-        		console.error(this.props.source, status, err.toString());
-      		}.bind(this)
-        });
-    },
-    handlePaginationPrevious: function() {
-    	if (this.state.cursor > 1) {
-    		this.state.cursor--;
-    		this.loadTicketsFromServer()};
-    },
-    handlePaginationNext: function() {
-    	if (this.state.next_page == 1) {
-    	this.state.cursor++;
-    	this.loadTicketsFromServer()};
-    },
-    componentDidMount: function() {
-	    this.loadTicketsFromServer();
-  	},
-  	componentDidUpdate: function (prevProps, prevState) {
-  	     if (prevProps.sentimentType !== this.props.sentimentType) {
-			this.loadTicketsFromServer();
-		} 
-  	},
   	render: function() {
+  		var getHandleTicketSelection = this.props.getHandleTicketSelection;
+  		var getHandleAccordions = this.props.getHandleAccordions;
+  		var selections = this.props.selections;
+  		var accordions = this.props.accordions;
   		var tickets = [];
   		i = 1
-  		if (this.state.data.length > 0) {
-  			this.state.data.forEach(function(t) {
-				tickets.push(<Ticket key = {i++} ticket={t} />);
-				tickets.push(<TicketAccordion key = {i++} ticket={t} />);
+  		if (this.props.data.length > 0) {
+  			this.props.data.forEach(function(t) {
+  				var handleTicketSelection = getHandleTicketSelection(t.ticket_id);
+  				var handleAccordions = getHandleAccordions(t.ticket_id);
+  				var selected = selections.indexOf(t.ticket_id) !== -1;
+				tickets.push(
+					<Ticket 
+						key = {t.ticket_id} 
+						ticket={t} 
+						selected = {selected} 
+						handleAccordions = {handleAccordions} 
+						handleTicketSelection = {handleTicketSelection} 
+					/>
+				);
+				if (accordions.indexOf(t.ticket_id) !== -1) {
+					tickets.push(
+						<TicketAccordion 
+							key = {t.ticket_id + "-accordion"} 
+							ticket={t} 
+						/>
+					);
+				}
   			});
   		};
-  		var display_start = ((this.state.cursor-1) * 20) + 1;
-  		var display_end = ((this.state.cursor-1) * 20) + this.state.data.length;
+  		var display_start = ((this.props.cursor-1) * 20) + 1;
+  		var display_end = ((this.props.cursor-1) * 20) + this.props.data.length;
 	    return (
 	    	<div className="ticketList">
 	        <nav>
 				<ul className="pagination">
-				    <li onClick={this.handlePaginationPrevious}>
+				    <li onClick={this.props.handlePaginationPrevious}>
 				    	<a href="#" aria-label="Previous">
 				        	<span aria-hidden="true">&laquo;</span>
 				      	</a>
 				    </li>
-				    <li onClick={this.handlePaginationNext}>
+				    <li onClick={this.props.handlePaginationNext}>
 				      	<a href="#" aria-label="Next">
 				        	<span aria-hidden="true">&raquo;</span>
 				      	</a>
 				    </li>
 				</ul>
 			</nav>
-			<p>Viewing {display_start}-{display_end} of {this.state.total_count}</p>
+			<p>Viewing {display_start}-{display_end} of {this.props.total_count}</p>
 	        <table className="table table-bordered table-condensed" >
 	        	<thead>
 	        	<tr className="active">
+	        		<th>Update?</th>
 	        		<th>Sentiment</th>
 	        		<th>Customer Name</th>
 	        		<th>Subject</th>
@@ -127,31 +109,135 @@ var TicketList = React.createClass({
 var InboxPage = React.createClass({
 	getInitialState: function() {
 		return {
-			sentimentType: this.props.sentiment
+			sentimentType: this.props.sentiment,
+			data: [],
+			selections: [],
+			cursor: 1,
+			has_next_page: false,
+			total_count: 0,
+			accordions: [],
 		};
 		
 	},
-	handleSentimentStateChange: function (newSentiment) {
-		this.setState({sentimentType: newSentiment});
+	getHandleAccordions: function(ticketId) {
+		return function() {
+			var accordions = this.state.accordions;
+			var newAccordions;
+			if (accordions.indexOf(ticketId) === -1) {
+				newAccordions = accordions.concat(ticketId)
+			} else {
+				newAccordions = accordions.filter(function (entry) {
+					return ticketId !== entry
+				})
+			}
+			this.setState({
+				accordions: newAccordions
+			})
+		}.bind(this)
 	},
+	getHandleTicketSelection: function(ticketId) {
+		return function() {
+			var selections = this.state.selections;
+			var newSelections;
+			if (selections.indexOf(ticketId) === -1) {
+				newSelections = selections.concat(ticketId)
+			} else {
+				newSelections = selections.filter(function (entry) {
+					return ticketId !== entry
+				})
+			}
+			this.setState({
+				selections: newSelections
+			})
+		}.bind(this)
+	},
+	loadTicketsFromServer: function() {
+        $.ajax({
+            url: this.props.source + this.state.sentimentType +"?page=" + this.state.cursor,
+            dataType: 'json',
+            type: 'get',
+            success: function(data) {
+                this.setState({data: data.items, cursor: data.cursor, has_next_page: data.next_page, total_count: data.total_count});
+            }.bind(this),
+            error: function(xhr, status, err) {
+        		console.error(this.props.source, status, err.toString());
+      		}.bind(this)
+        });
+    },
+	handleSentimentStateChange: function (newSentimentType) {
+		return function () {
+    		this.setState({
+    			sentimentType: newSentimentType
+    		})
+    	}.bind(this)
+	},
+	componentDidMount: function () {
+	    this.loadTicketsFromServer()  
+	},
+	componentDidUpdate: function (prevProps, prevState) {
+	    if (this.state.cursor !== prevState.cursor || this.state.sentimentType !== prevState.sentimentType) {
+	    	this.loadTicketsFromServer();
+	    }
+	},
+	handlePaginationPrevious: function() {
+    	if (this.state.cursor > 1) {
+    		this.setState({
+    			cursor: this.state.cursor - 1
+    		})
+    	};
+    },
+    handlePaginationNext: function() {
+    	if (this.state.has_next_page == true) {
+    		this.setState({
+    			cursor: this.state.cursor + 1
+    		})
+    	};
+    },
+    handleSentimentChange: function() {
+    	var newSentiment = this.refs.controlSelect.getDOMNode().value;
+    	$.ajax({
+            url: this.props.source,
+            dataType: 'json',
+            type: 'post',
+            data: {
+            	newSentiment: newSentiment,
+            	selections: this.state.selections
+            },
+            success: function() {
+                this.loadTicketsFromServer()
+            }.bind(this),
+            error: function(xhr, status, err) {
+        		console.error(this.props.source, status, err.toString());
+      		}.bind(this)
+        });
+    },
   	render: function() {
     return (
     	<div className= "container">
+    		<div className = "controller">
+    			<select ref = "controlSelect">
+    				<option value="upset">Upset</option>
+    				<option value="neutral">Neutral</option>
+    				<option value="positive">Positive</option>
+    			</select>
+    			<button onClick= {this.handleSentimentChange}>Update</button>
+    		</div>
 		    <ul className="list-group" className="col-md-3">
-			  <li onClick={this.handleSentimentStateChange.bind(null,"upset")} className="list-group-item">
+			  <li onClick={this.handleSentimentStateChange("upset")} className="list-group-item">
 			    <span className="badge">#</span>
 			    Upset
 			  </li>
-			  <li onClick={this.handleSentimentStateChange.bind(null,"neutral")} className="list-group-item">
+			  <li onClick={this.handleSentimentStateChange("neutral")} className="list-group-item">
 			    <span className="badge">#</span>
 			    Neutral
 			  </li>
-			  <li onClick={this.handleSentimentStateChange.bind(null,"positive")} className="list-group-item">
+			  <li onClick={this.handleSentimentStateChange("positive")} className="list-group-item">
 			    <span className="badge">#</span>
 			    Positive
 			  </li>
 			</ul>
-		    <TicketList sentimentType={this.state.sentimentType} source = {this.props.source}/>
+		    <TicketList getHandleAccordions= {this.getHandleAccordions} getHandleTicketSelection= {this.getHandleTicketSelection} handlePaginationNext={this.handlePaginationNext} handlePaginationPrevious={this.handlePaginationPrevious} 
+		    	{...this.state} />
     	</div>
     	);
 

@@ -2,8 +2,9 @@
 
 
 var SentimentGraph = React.createClass({
-  render: function() {
-    var chart = c3.generate({
+  componentDidMount: function() {
+    this.chart = c3.generate({
+      bindto: this.refs.myContainer.getDOMNode(),
     data: {
         x: 'x',
         columns: [
@@ -28,9 +29,17 @@ var SentimentGraph = React.createClass({
       },
     }
 });
+  },
+  updateGraph: function () {
+    //ETL putting data in format I need
+  },
+  componentDidUpdate: function () {
+    this.updateGraph()
+    //call only if data changes
+  },
+  render: function() {
     return (
-      <div id="chart">
-      {chart}
+      <div ref="myContainer">
       </div>
      );
   }
@@ -80,10 +89,10 @@ var SentimentCounterList = React.createClass({
     };
     return (
       <div>
-        <div className="counterList">
-        {counts}
-        </div>
-        <SentimentGraph />
+      <div className="counterList">
+      {counts}
+      </div>
+      <SentimentGraph />
       </div>
     );
   }
@@ -100,12 +109,14 @@ var Dashboard = React.createClass({
 
   },
   render: function() {
+    var timePeriod = this.state.timePeriod;
     return (
       <div className= "container">
       <ul className="nav nav-tabs">
-        <li onClick={this.handleTimeChange.bind(null,"today")} role="presentation" className="active"><a href="#">Today</a></li>
-        <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation"><a href="#">Last Week</a></li>
-        <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation"><a href="#">Last Month</a></li>
+        <li onClick={this.handleTimeChange.bind(null,"today")} role="presentation" 
+        className={timePeriod == "today" ? "active" : null}><a href="#">Today</a></li>
+        <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation" className={timePeriod == "week" ? "active" : null}><a href="#">Last Week</a></li>
+        <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation" className={timePeriod == "month" ? "active" : null}><a href="#">Last Month</a></li>
       </ul>
       <SentimentCounterList timePeriod={this.state.timePeriod} source = {this.props.source}/>
       </div>
