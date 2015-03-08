@@ -16,9 +16,6 @@ var Ticket = React.createClass({
 	updateSentiment: function () {
 
 	},
-	// $.get('/changeSentiment', funtion(){
-	// 	this.props.updateMe();
-	// })
   	render: function() {
 	  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
 	  	var date = moment(this.props.date)
@@ -68,8 +65,8 @@ var TicketList = React.createClass({
 				}
   			});
   		};
-  		var display_start = ((this.props.cursor-1) * 20) + 1;
-  		var display_end = ((this.props.cursor-1) * 20) + this.props.data.length;
+  		var displayStart = ((this.props.cursor-1) * 20) + 1;
+  		var displayEnd = ((this.props.cursor-1) * 20) + this.props.data.length; 
 	    return (
 	    	<div className="ticketList">
 	        <nav>
@@ -86,7 +83,7 @@ var TicketList = React.createClass({
 				    </li>
 				</ul>
 			</nav>
-			<p>Viewing {display_start}-{display_end} of {this.props.total_count}</p>
+			<p>Viewing {displayStart}-{displayEnd} of {this.props.sentimentCount}</p>
 	        <table className="table table-bordered table-condensed" >
 	        	<thead>
 	        	<tr className="active">
@@ -157,7 +154,7 @@ var InboxPage = React.createClass({
             dataType: 'json',
             type: 'get',
             success: function(data) {
-                this.setState({data: data.items, cursor: data.cursor, has_next_page: data.next_page, total_count: data.total_count});
+                this.setState({data: data.items, cursor: data.cursor, has_next_page: data.next_page, total_count: data.total_count, sentimentCount: data.sentiment_count});
             }.bind(this),
             error: function(xhr, status, err) {
         		console.error(this.props.source, status, err.toString());
@@ -224,15 +221,15 @@ var InboxPage = React.createClass({
     		</div>
 		    <ul className="list-group" className="col-md-3">
 			  <li onClick={this.handleSentimentStateChange("upset")} className="list-group-item">
-			    <span className="badge">#</span>
+			    <span className="badge">{this.state.total_count[0]}</span>
 			    Upset
 			  </li>
 			  <li onClick={this.handleSentimentStateChange("neutral")} className="list-group-item">
-			    <span className="badge">#</span>
+			    <span className="badge">{this.state.total_count[1]}</span>
 			    Neutral
 			  </li>
 			  <li onClick={this.handleSentimentStateChange("positive")} className="list-group-item">
-			    <span className="badge">#</span>
+			    <span className="badge">{this.state.total_count[2]}</span>
 			    Positive
 			  </li>
 			</ul>

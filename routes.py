@@ -35,8 +35,10 @@ class User(db.Model):
 	organization_name = db.Column(db.String, nullable = True)
 
 @app.route('/sent/api/tickets/', methods=['POST'])
-def update_ticket_sentiment(data):
-	pass
+def update_ticket_sentiment():
+	if request.method =='POST':
+		target_sentiment = data[newSentiment]
+		print target_sentiment
 
 @app.route('/sent/api/tickets/<label>/', methods=['GET'])
 def tickets(label):
@@ -70,13 +72,14 @@ def tickets(label):
 			}
 			json_results.append(d)
 
-		# total_message_count = []
-		# labels = ["upset", "neutral", "positive"]
-		# for label in labels:
-		# 	count = {label:Ticket.query.filter(Ticket.sentiment_label == label).count()}
-		# 	total_message_count.append(count)
-		total_message_count = Ticket.query.filter(Ticket.sentiment_label == label).count()
-		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count)
+		sentiment_message_count = Ticket.query.filter(Ticket.sentiment_label == label).count()
+		total_message_count = []
+		labels = ["upset", "neutral", "positive"]
+		for each in labels:
+			count = Ticket.query.filter(Ticket.sentiment_label == each).count()
+			total_message_count.append(count)
+
+		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count, sentiment_count = sentiment_message_count)
 
 
 @app.route('/sent/api/data/', methods=['GET'])
