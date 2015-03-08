@@ -1,18 +1,46 @@
 /** @jsx React.DOM */
 
 
-// var SentimentGraph = React.createClass({
-//   render: function() {
-//     return (
-//      );
-//   }
-// });
+var SentimentGraph = React.createClass({
+  render: function() {
+    var chart = c3.generate({
+    data: {
+        x: 'x',
+        columns: [
+            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
+            ['upset', 5, 20, 10, 40, 15, 25],
+            ['neutral', 13, 34, 20, 50, 25, 35],
+            ['positive', 13, 34, 20, 50, 25, 35]
+        ]
+    },
+    axis: {
+        x: {
+            type: 'timeseries',
+            tick: {
+                format: '%Y-%m-%d'
+            }
+        },
+        y: {
+        label: {
+          text: 'Ticket Count',
+          position: 'outer-middle'
+        }
+      },
+    }
+});
+    return (
+      <div id="chart">
+      {chart}
+      </div>
+     );
+  }
+});
 
 var SentimentCounter = React.createClass({
   render: function() {
     return (
       <div className= "box" id = "counter">
-        <p>{this.props.sentimentCount.count}</p>
+        <p id="countertext">{this.props.sentimentCount.count}</p>
       </div>
       );
   }
@@ -20,16 +48,15 @@ var SentimentCounter = React.createClass({
 
 var SentimentCounterList = React.createClass({
   getInitialState: function() {
-    return {data: [], cursor: this.props.timePeriod};
+    return {data: [], timePeriod: this.props.timePeriod};
   },
   loadCountsFromServer: function() {
       $.ajax({
-          url: this.props.source + "?time=" + this.state.cursor,
+          url: this.props.source + "?time=" + this.props.timePeriod,
           dataType: 'json',
           type: 'get',
           success: function(data) {
-            console.log(data);
-              this.setState({data: data.counts, cursor: data.cursor});
+              this.setState({data: data.counts});
           }.bind(this),
           error: function(xhr, status, err) {
           console.error(this.props.source, status, err.toString());
@@ -41,7 +68,7 @@ var SentimentCounterList = React.createClass({
   },
   componentDidUpdate: function (prevProps, prevState) {
       if (prevProps.timePeriod !== this.props.timePeriod) {
-      this.loadTicketsFromServer();
+      this.loadCountsFromServer();
     } 
     },
   render: function() {
@@ -52,8 +79,11 @@ var SentimentCounterList = React.createClass({
       });
     };
     return (
-      <div className="counterList">
-      {counts}
+      <div>
+        <div className="counterList">
+        {counts}
+        </div>
+        <SentimentGraph />
       </div>
     );
   }
@@ -67,6 +97,7 @@ var Dashboard = React.createClass({
   },
   handleTimeChange: function (period) {
     this.setState({timePeriod: period});
+
   },
   render: function() {
     return (

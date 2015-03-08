@@ -91,7 +91,6 @@ var TicketList = React.createClass({
   		var display_end = ((this.state.cursor-1) * 20) + this.state.data.length;
 	    return (
 	    	<div className="ticketList">
-	        <h1>Tickets</h1>
 	        <nav>
 				<ul className="pagination">
 				    <li onClick={this.handlePaginationPrevious}>
@@ -107,7 +106,7 @@ var TicketList = React.createClass({
 				</ul>
 			</nav>
 			<p>Viewing {display_start}-{display_end} of {this.state.total_count}</p>
-	        <table className="table table-bordered table-condensed">
+	        <table className="table table-bordered table-condensed" >
 	        	<thead>
 	        	<tr className="active">
 	        		<th>Sentiment</th>
@@ -138,23 +137,21 @@ var InboxPage = React.createClass({
   	render: function() {
     return (
     	<div className= "container">
-			<ul className="list-group">
+		    <ul className="list-group" className="col-md-3">
 			  <li onClick={this.handleSentimentStateChange.bind(null,"upset")} className="list-group-item">
-			    <span className="badge">14</span>
+			    <span className="badge">#</span>
 			    Upset
 			  </li>
 			  <li onClick={this.handleSentimentStateChange.bind(null,"neutral")} className="list-group-item">
-			    <span className="badge">14</span>
+			    <span className="badge">#</span>
 			    Neutral
 			  </li>
 			  <li onClick={this.handleSentimentStateChange.bind(null,"positive")} className="list-group-item">
-			    <span className="badge">14</span>
+			    <span className="badge">#</span>
 			    Positive
 			  </li>
 			</ul>
-	    	<div>
-		    	<TicketList sentimentType={this.state.sentimentType} source = {this.props.source}/>
-	    	</div>
+		    <TicketList sentimentType={this.state.sentimentType} source = {this.props.source}/>
     	</div>
     	);
 

@@ -50,6 +50,7 @@ def tickets(label):
 	 		next_page = 0
 
 	  	json_results = []
+	 	cursor = page
 		for result in ticket_results[0:20]:
 			d = {
 	    		'ticket_id': result.ticket_id,
@@ -64,9 +65,13 @@ def tickets(label):
 				'sentiment': result.sentiment_label
 			}
 			json_results.append(d)
-		cursor = page
-		total_message_count = []
-		Ticket.query.filter(Ticket.sentiment_label == label).count()	
+
+		# total_message_count = []
+		# labels = ["upset", "neutral", "positive"]
+		# for label in labels:
+		# 	count = {label:Ticket.query.filter(Ticket.sentiment_label == label).count()}
+		# 	total_message_count.append(count)
+		total_message_count = Ticket.query.filter(Ticket.sentiment_label == label).count()
 		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count)
 
 
@@ -88,14 +93,18 @@ def counts():
 			json_count_results.append(count)
 	elif time_period == "week":
 		for label in labels:
-			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count()}
+			count = {
+		    		'label': label,
+					'count': Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count(),
+					'graph_data': "filler",
+			}
 			json_count_results.append(count)
 	elif time_period == "month":
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}
 			json_count_results.append(count)
 
-	return jsonify(counts=json_count_results, cursor = time_period)
+	return jsonify(counts=json_count_results, time_period = time_period)
 
 
 @app.route("/")
