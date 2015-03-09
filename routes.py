@@ -6,6 +6,9 @@ from model import session
 from datetime import datetime, date, timedelta
 import json
 
+
+#CONNECTION TO DB
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sent.db'
 db = SQLAlchemy(app)
@@ -35,6 +38,19 @@ class User(db.Model):
 	name = db.Column(db.String(100))
 	email = db.Column(db.String(100))
 	organization_name = db.Column(db.String, nullable = True)
+
+#SERVER ROUTES
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route('/inbox/', defaults={'label':'all'})
+@app.route('/inbox/<label>')
+def show_inbox(label):
+	return render_template("inbox.html", label = label)
+
+# API ENDPOINTS
 
 @app.route('/sent/api/tickets/', methods=['POST'])
 def update_ticket_sentiment():
@@ -95,24 +111,72 @@ def tickets(label):
 
 		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count, sentiment_count = sentiment_message_count)
 
-
 @app.route('/sent/api/data/', methods=['GET'])
 def counts():
 
 	time_period = request.args.get('time')
 	
 	today = datetime.now()
-	last_day = datetime.now() - timedelta(hours = 24)
-	last_week = datetime.now() - timedelta(days = 7)
-	last_month = datetime.now() - timedelta(days = 30)
+	last_day = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+	last_week = (today - timedelta(days = 6)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+	last_month = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+
+	#initializing lists to use during querying for graph data points
+	today_by_hour = []
+	last_week_by_day = []
+	last_month_by_day = []
+
+	#create a list of all hours in a day to query for
+	hour = last_day
+	for each_hour in range(24):
+		hour = hour + timedelta(hours = 1)
+		today_by_hour.append(hour)
+
+	#create a list of all days of a week to query for
+	day = last_week
+	for each_day in range(7):
+		day = day + timedelta(days = 1)
+		last_week_by_day.append(day)
+	print last_week_by_day
+
+	#create a list of all days of a month to query for
+	day = last_month
+	for each_day in range(30):
+		day = day + timedelta(days = 1)
+		last_week_by_day.append(day)
+	print last_month_by_day
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 	labels = ["upset", "neutral", "positive"]
 	json_count_results = []
+	columns = []
+
 	if time_period == "today":
+		x_axis = ['x']
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_day).count()}
 			json_count_results.append(count)
+
+
+
+
+
 	elif time_period == "week":
+		x_axis = ['x']
 		for label in labels:
 			count = {
 		    		'label': label,
@@ -120,23 +184,17 @@ def counts():
 					'graph_data': "filler",
 			}
 			json_count_results.append(count)
+
+
+
+
+
 	elif time_period == "month":
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}
 			json_count_results.append(count)
 
 	return jsonify(counts=json_count_results, time_period = time_period)
-
-
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-@app.route('/inbox/', defaults={'label':'all'})
-@app.route('/inbox/<label>')
-def show_inbox(label):
-	return render_template("inbox.html", label = label)
-
 
 
 if __name__ == "__main__":
