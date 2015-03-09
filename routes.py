@@ -4,6 +4,7 @@ from sqlalchemy import and_, update
 import model
 from model import session
 from datetime import datetime, date, timedelta
+import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sent.db'
@@ -44,11 +45,11 @@ def update_ticket_sentiment():
 	for ticket_num in changing_tickets:
 		session.query(Ticket).filter(Ticket.ticket_id == ticket_num).update({"sentiment_label" : target_sentiment})
 		session.commit()
-	
-		response = Response(status = 200)
-	return "ECHO: POST\n"
-	
 
+	js = json.dumps({"status":"success"})
+	
+	response = Response(js, mimetype='application/json', status = 200)
+	return response
 
 @app.route('/sent/api/tickets/<label>/', methods=['GET'])
 def tickets(label):
@@ -139,5 +140,4 @@ def show_inbox(label):
 
 
 if __name__ == "__main__":
-    # app.run(port = 10000, debug = True)
-    app.run(host="0.0.0.0", debug = False)
+    app.run(port = 10000, debug = True)
