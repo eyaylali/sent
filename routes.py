@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, g, jsonify
+from flask import Flask, render_template, redirect, request, g, jsonify, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, func
 import model
@@ -36,18 +36,24 @@ class User(db.Model):
 
 @app.route('/sent/api/tickets/', methods=['POST'])
 def update_ticket_sentiment():
-	if request.method =='POST':
-		target_sentiment = data[newSentiment]
-		print target_sentiment
+	# data = request.form
+	# target_sentiment = data['newSentiment']
+	# changing_tickets = data['selections']
+	# print target_sentiment, changing_tickets
+	return render_template('inbox.html')
+
 
 @app.route('/sent/api/tickets/<label>/', methods=['GET'])
 def tickets(label):
 	if request.method == 'GET':	
 		page = int(request.args.get('page'))
 		display_qty = 20
-		query_qty = 21 
+		query_qty = 21
 
-	 	ticket_results = Ticket.query.filter(Ticket.sentiment_label == label).order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
+		if label == "all":
+			 ticket_results = Ticket.query.order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
+		else:
+	 		ticket_results = Ticket.query.filter(Ticket.sentiment_label == label).order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
 	 	
 	 	#to check to see if we will need another paginated page after this page
 	 	if len(ticket_results) > 20:
@@ -118,8 +124,10 @@ def counts():
 def index():
     return render_template("index.html")
 
-@app.route("/inbox/<label>")
+@app.route('/inbox/', defaults={'label':'all'})
+@app.route('/inbox/<label>')
 def show_inbox(label):
+	print label
 	return render_template("inbox.html", label = label)
 
 
