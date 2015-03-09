@@ -1,7 +1,8 @@
-from flask import Flask, render_template, redirect, request, g, jsonify, url_for
+from flask import Flask, render_template, redirect, request, g, jsonify, url_for, Response
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import and_, func
+from sqlalchemy import and_, update
 import model
+from model import session
 from datetime import datetime, date, timedelta
 
 app = Flask(__name__)
@@ -36,11 +37,17 @@ class User(db.Model):
 
 @app.route('/sent/api/tickets/', methods=['POST'])
 def update_ticket_sentiment():
-	# data = request.form
-	# target_sentiment = data['newSentiment']
-	# changing_tickets = data['selections']
-	# print target_sentiment, changing_tickets
-	return render_template('inbox.html')
+	data = request.form
+	target_sentiment = data['newSentiment']
+	changing_tickets = request.form.getlist('selections[]')
+
+	for ticket_num in changing_tickets:
+		session.query(Ticket).filter(Ticket.ticket_id == ticket_num).update({"sentiment_label" : target_sentiment})
+		session.commit()
+	
+		response = Response(status = 200)
+	return "ECHO: POST\n"
+	
 
 
 @app.route('/sent/api/tickets/<label>/', methods=['GET'])
@@ -127,10 +134,10 @@ def index():
 @app.route('/inbox/', defaults={'label':'all'})
 @app.route('/inbox/<label>')
 def show_inbox(label):
-	print label
 	return render_template("inbox.html", label = label)
 
 
 
 if __name__ == "__main__":
-    app.run(port = 10000, debug = True)
+    # app.run(port = 10000, debug = True)
+    app.run(host="0.0.0.0", debug = False)

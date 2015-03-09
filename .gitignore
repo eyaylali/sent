@@ -1,3 +1,5 @@
 /test_data
 /venv
 secrets.sh
+.DS_Store
+*.pyc

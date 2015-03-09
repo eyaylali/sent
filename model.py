@@ -51,17 +51,6 @@ class User(Base):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
 		pass
 
-# class Organization(Base):
-# 	__tablename__ = "organizations"
-
-# 	id = Column(Integer, primary_key = True)
-# 	zendesk_org_id = Column(Integer)
-# 	name = Column(String(100))
-
-# 	def __repr__(self):
-# 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
-# 		pass
-
 ### End class declarations
 
 def main():

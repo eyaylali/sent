@@ -13,9 +13,6 @@ var TicketAccordion = React.createClass({
 });
 
 var Ticket = React.createClass({
-	updateSentiment: function () {
-
-	},
   	render: function() {
 	  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
 	  	var date = moment(this.props.date)
@@ -66,7 +63,13 @@ var TicketList = React.createClass({
   			});
   		};
   		var displayStart = ((this.props.cursor-1) * 20) + 1;
-  		var displayEnd = ((this.props.cursor-1) * 20) + this.props.data.length; 
+  		var displayEnd = ((this.props.cursor-1) * 20) + this.props.data.length;
+  		var displayTotal;
+  		if (this.props.sentimentType === "all") {
+  			displayTotal = this.props.total_count[0] + this.props.total_count[1] + this.props.total_count[2];
+  		} else {
+  			displayTotal = this.props.sentimentCount;
+  		};
 	    return (
 	    	<div className="ticketList">
 	        <nav>
@@ -83,7 +86,7 @@ var TicketList = React.createClass({
 				    </li>
 				</ul>
 			</nav>
-			<p>Viewing {displayStart}-{displayEnd} of {this.props.sentimentCount}</p>
+			<p>Viewing {displayStart}-{displayEnd} of {displayTotal}</p>
 	        <table className="table table-bordered table-condensed" >
 	        	<thead>
 	        	<tr className="active">
