@@ -9,7 +9,6 @@ var SentimentGraph = React.createClass({
     } else {
       var formatDisplay = '%H:%M';
     };
-    var formatDisplay = '%Y-%m-%d';
     this.chart = c3.generate({
       bindto: this.refs.myContainer.getDOMNode(),
     data: {
