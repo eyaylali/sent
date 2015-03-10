@@ -14,7 +14,7 @@ var SentimentGraph = React.createClass({
         x: {
             type: 'timeseries',
             tick: {
-                format: '%H:%M'
+                format: this.props.format
             }
         },
         y: {
@@ -36,7 +36,7 @@ var SentimentGraph = React.createClass({
     console.log(this.props.timePeriod);
     this.chart.load({
     columns: this.props.columns,
-    tick: {format: formatDisplay}
+    format: formatDisplay
     });
   },
   componentDidUpdate: function (prevProps, prevState) {
