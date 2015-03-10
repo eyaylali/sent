@@ -3,6 +3,12 @@
 
 var SentimentGraph = React.createClass({
   componentDidMount: function() {
+    if (this.props.timePeriod == "today") {
+      format = '%Y-%m-%d %H'
+    } else {
+      format = '%Y-%m-%d'
+    };
+
     this.chart = c3.generate({
       bindto: this.refs.myContainer.getDOMNode(),
     data: {
@@ -13,7 +19,7 @@ var SentimentGraph = React.createClass({
         x: {
             type: 'timeseries',
             tick: {
-                format: '%Y-%m-%d'
+                format: format
             }
         },
         y: {
@@ -26,7 +32,7 @@ var SentimentGraph = React.createClass({
 });
   },
   updateGraph: function () {
-    chart.load({
+    this.chart.load({
     columns: this.props.columns
     });
   },
@@ -91,7 +97,7 @@ var SentimentCounterList = React.createClass({
       <div className="counterList">
       {counts}
       </div>
-      <SentimentGraph />
+      <SentimentGraph {...this.state}/>
       </div>
     );
   }

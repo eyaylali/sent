@@ -154,7 +154,7 @@ def counts():
 	columns = []
 
 	if time_period == "today":
-		x_axis = ['x'] + today_by_hour
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H") for d in today_by_hour]
 		columns.append(x_axis)
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_day).count()}
@@ -171,7 +171,7 @@ def counts():
 			columns.append(data_points)
 
 	if time_period == "week":
-		x_axis = ['x'] + last_week_by_day
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d") for d in last_week_by_day]
 		columns.append(x_axis)
 		for label in labels:
 			count = {'label': label, 'count': Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count()}
@@ -188,7 +188,7 @@ def counts():
 			columns.append(data_points)
 
 	if time_period == "month":
-		x_axis = ['x'] + last_month_by_day
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d") for d in last_month_by_day]
 		columns.append(x_axis)
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}
@@ -203,7 +203,7 @@ def counts():
 					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(last_month_by_day[i], last_month_by_day[i+1])).count()
 					data_points.append(data_point)	
 			columns.append(data_points)
-			
+
 	return jsonify(time_period = time_period, counts=json_count_results, columns = columns)
 
 
