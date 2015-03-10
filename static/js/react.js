@@ -165,7 +165,6 @@ var InboxPage = React.createClass({
 					total_count: data.total_count, 
 					sentimentCount: data.sentiment_count
 				};
-				console.log(state);
                 this.setState(state);
             }.bind(this),
             error: function(xhr, status, err) {

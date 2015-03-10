@@ -7,12 +7,7 @@ var SentimentGraph = React.createClass({
       bindto: this.refs.myContainer.getDOMNode(),
     data: {
         x: 'x',
-        columns: [
-            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
-            ['upset', 5, 20, 10, 40, 15, 25],
-            ['neutral', 13, 34, 20, 50, 25, 35],
-            ['positive', 13, 3, 50, 50, 20, 30]
-        ]
+        columns: this.props.columns
     },
     axis: {
         x: {
@@ -31,11 +26,14 @@ var SentimentGraph = React.createClass({
 });
   },
   updateGraph: function () {
-    //ETL putting data in format I need
+    chart.load({
+    columns: this.props.columns
+    });
   },
-  componentDidUpdate: function () {
-    this.updateGraph()
-    //call only if data changes
+  componentDidUpdate: function (prevProps, prevState) {
+      if (prevProps.columns !== this.props.columns) {
+      this.updateGraph();
+    } 
   },
   render: function() {
     return (
@@ -57,7 +55,7 @@ var SentimentCounter = React.createClass({
 
 var SentimentCounterList = React.createClass({
   getInitialState: function() {
-    return {data: [], timePeriod: this.props.timePeriod};
+    return {data: [], timePeriod: this.props.timePeriod, columns: []};
   },
   loadCountsFromServer: function() {
       $.ajax({
@@ -65,7 +63,7 @@ var SentimentCounterList = React.createClass({
           dataType: 'json',
           type: 'get',
           success: function(data) {
-              this.setState({data: data.counts});
+              this.setState({data: data.counts, timePeriod : data.time_period, columns : data.columns});
           }.bind(this),
           error: function(xhr, status, err) {
           console.error(this.props.source, status, err.toString());
@@ -81,6 +79,7 @@ var SentimentCounterList = React.createClass({
     } 
     },
   render: function() {
+    console.log(this.state);
     var counts = [];
     if (this.state.data.length > 0) {
       this.state.data.forEach(function(c) {
@@ -118,7 +117,7 @@ var Dashboard = React.createClass({
         <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation" className={timePeriod == "week" ? "active" : null}><a href="#">Last Week</a></li>
         <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation" className={timePeriod == "month" ? "active" : null}><a href="#">Last Month</a></li>
       </ul>
-      <SentimentCounterList timePeriod={this.state.timePeriod} source = {this.props.source}/>
+      <SentimentCounterList {...this.state} source = {this.props.source}/>
       </div>
     	);
   }

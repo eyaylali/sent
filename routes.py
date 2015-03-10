@@ -118,7 +118,7 @@ def counts():
 	
 	today = datetime.now()
 	last_day = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-	last_week = (today - timedelta(days = 6)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+	last_week = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 	last_month = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 
 	#initializing lists to use during querying for graph data points
@@ -144,7 +144,7 @@ def counts():
 	day = last_month
 	for each_day in range(30):
 		day = day + timedelta(days = 1)
-		last_week_by_day.append(day)
+		last_month_by_day.append(day)
 	print last_month_by_day
 
 	# Query and collect data for each sentiment for the given time_range
@@ -170,7 +170,7 @@ def counts():
 					data_points.append(data_point)	
 			columns.append(data_points)
 
-	elif time_period == "week":
+	if time_period == "week":
 		x_axis = ['x'] + last_week_by_day
 		columns.append(x_axis)
 		for label in labels:
@@ -187,7 +187,7 @@ def counts():
 					data_points.append(data_point)	
 			columns.append(data_points)
 
-	elif time_period == "month":
+	if time_period == "month":
 		x_axis = ['x'] + last_month_by_day
 		columns.append(x_axis)
 		for label in labels:
@@ -197,13 +197,13 @@ def counts():
 
 			for i in range(30):
 				if i == 29:
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week_by_day[i]).count()
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month_by_day[i]).count()
 					data_points.append(data_point)
 				else:
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(last_week_by_day[i], last_week_by_day[i+1])).count()
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(last_month_by_day[i], last_month_by_day[i+1])).count()
 					data_points.append(data_point)	
 			columns.append(data_points)
-
+			
 	return jsonify(time_period = time_period, counts=json_count_results, columns = columns)
 
 
