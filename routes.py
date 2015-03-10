@@ -154,7 +154,7 @@ def counts():
 	columns = []
 
 	if time_period == "today":
-		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H") for d in today_by_hour]
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]
 		columns.append(x_axis)
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_day).count()}
