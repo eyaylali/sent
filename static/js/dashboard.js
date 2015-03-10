@@ -1,6 +1,5 @@
 /** @jsx React.DOM */
 
-
 var SentimentGraph = React.createClass({
   componentDidMount: function() {
     this.chart = c3.generate({
@@ -14,7 +13,7 @@ var SentimentGraph = React.createClass({
         x: {
             type: 'timeseries',
             tick: {
-                format: this.props.format
+                format: this.getFormatDisplay()
             }
         },
         y: {
@@ -27,17 +26,17 @@ var SentimentGraph = React.createClass({
 });
   },
   updateGraph: function () {
+    this.chart.load({
+    columns: this.props.columns,
+    format: this.getFormatDisplay()
+    });
+  },
+  getFormatDisplay: function () {
     if (this.props.timePeriod !== "today") {
-      console.log("HI");
       var formatDisplay = '%Y-%m-%d';
     } else {
       var formatDisplay = '%H:%M';
     };
-    console.log(this.props.timePeriod);
-    this.chart.load({
-    columns: this.props.columns,
-    format: formatDisplay
-    });
   },
   componentDidUpdate: function (prevProps, prevState) {
       if (prevProps.columns !== this.props.columns) {
@@ -91,7 +90,7 @@ var SentimentCounterList = React.createClass({
     var counts = [];
     if (this.state.data.length > 0) {
       this.state.data.forEach(function(c) {
-      counts.push(<SentimentCounter sentimentCount={c} />);
+      counts.push(<SentimentCounter key={c.label} sentimentCount={c} />);
       });
     };
     return (

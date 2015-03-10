@@ -72,15 +72,6 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 
 		session.commit()
 
-# def unpack_zendesk_organizations(session, dict_input):
-# 	for organization in dict_input["organizations"]:
-# 		zendesk_org_id = organization["id"]
-# 		name = organization["name"]
-
-# 		organization = model.Organization(zendesk_org_id = zendesk_org_id, name = name, tags = tags)
-# 		session.add(organization)
-# 	session.commit()
-
 def predict_sentiment_label(all_content):
 	label = train.predict(classifier, [all_content])
 	return label[0]

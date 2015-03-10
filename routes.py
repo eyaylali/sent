@@ -138,14 +138,12 @@ def counts():
 	for each_day in range(7):
 		day = day + timedelta(days = 1)
 		last_week_by_day.append(day)
-	print last_week_by_day
 
 	#create a list of all days of a month to query for
 	day = last_month
 	for each_day in range(30):
 		day = day + timedelta(days = 1)
 		last_month_by_day.append(day)
-	print last_month_by_day
 
 	# Query and collect data for each sentiment for the given time_range
 
