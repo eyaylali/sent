@@ -3,12 +3,6 @@
 
 var SentimentGraph = React.createClass({
   componentDidMount: function() {
-    console.log(this.props.timePeriod);
-    if (this.props.timePeriod !== "today") {
-      var formatDisplay = '%Y-%m-%d';
-    } else {
-      var formatDisplay = '%H:%M';
-    };
     this.chart = c3.generate({
       bindto: this.refs.myContainer.getDOMNode(),
     data: {
@@ -20,7 +14,7 @@ var SentimentGraph = React.createClass({
         x: {
             type: 'timeseries',
             tick: {
-                format: formatDisplay
+                format: '%H:%M'
             }
         },
         y: {
@@ -33,8 +27,16 @@ var SentimentGraph = React.createClass({
 });
   },
   updateGraph: function () {
+    if (this.props.timePeriod !== "today") {
+      console.log("HI");
+      var formatDisplay = '%Y-%m-%d';
+    } else {
+      var formatDisplay = '%H:%M';
+    };
+    console.log(this.props.timePeriod);
     this.chart.load({
-    columns: this.props.columns
+    columns: this.props.columns,
+    tick: {format: formatDisplay}
     });
   },
   componentDidUpdate: function (prevProps, prevState) {
