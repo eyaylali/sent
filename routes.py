@@ -171,7 +171,7 @@ def counts():
 			columns.append(data_points)
 
 	if time_period == "week":
-		x_axis = ['x'] + [d.strftime("%Y-%m-%d") for d in last_week_by_day]
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_week_by_day]
 		columns.append(x_axis)
 		for label in labels:
 			count = {'label': label, 'count': Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count()}
@@ -188,7 +188,7 @@ def counts():
 			columns.append(data_points)
 
 	if time_period == "month":
-		x_axis = ['x'] + [d.strftime("%Y-%m-%d") for d in last_month_by_day]
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_month_by_day]
 		columns.append(x_axis)
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}

@@ -3,21 +3,18 @@
 
 var SentimentGraph = React.createClass({
   componentDidMount: function() {
-    // console.log(this.props.timePeriod);
-    // if (this.props.timePeriod !== "today") {
-    //   var formatDisplay = '%Y-%m-%d';
-    //   var format = '%Y-%m-%d';
-    // } else {
-    //   var formatDisplay = '%H:%M';
-    //   var format = '%Y-%m-%d %H:%M:%S';
-    // };
+    console.log(this.props.timePeriod);
+    if (this.props.timePeriod !== "today") {
+      var formatDisplay = '%Y-%m-%d';
+    } else {
+      var formatDisplay = '%H:%M';
+    };
     var formatDisplay = '%Y-%m-%d';
-    var format = '%Y-%m-%d';
     this.chart = c3.generate({
       bindto: this.refs.myContainer.getDOMNode(),
     data: {
         x: 'x',
-        xFormat: format,
+        xFormat: "%Y-%m-%d %H:%M:%S",
         columns: this.props.columns
     },
     axis: {
