@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, request, g, jsonify, url_for, Response
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import and_, update
+from sqlalchemy import and_, update, between
 import model
 from model import session
 from datetime import datetime, date, timedelta
@@ -128,7 +128,8 @@ def counts():
 
 	#create a list of all hours in a day to query for
 	hour = last_day
-	for each_hour in range(24):
+	this_hour = today.hour
+	for each_hour in range(this_hour):
 		hour = hour + timedelta(hours = 1)
 		today_by_hour.append(hour)
 
@@ -146,55 +147,64 @@ def counts():
 		last_week_by_day.append(day)
 	print last_month_by_day
 
+	# Query and collect data for each sentiment for the given time_range
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
 	labels = ["upset", "neutral", "positive"]
 	json_count_results = []
 	columns = []
 
 	if time_period == "today":
-		x_axis = ['x']
+		x_axis = ['x'] + today_by_hour
+		columns.append(x_axis)
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_day).count()}
 			json_count_results.append(count)
+			data_points = [label]
 
-
-
-
+			for i in range(len(today_by_hour)):
+				if i == (len(today_by_hour) - 1):
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > today_by_hour[i]).count()
+					data_points.append(data_point)
+				else:
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(today_by_hour[i], today_by_hour[i+1])).count()
+					data_points.append(data_point)	
+			columns.append(data_points)
 
 	elif time_period == "week":
-		x_axis = ['x']
+		x_axis = ['x'] + last_week_by_day
+		columns.append(x_axis)
 		for label in labels:
-			count = {
-		    		'label': label,
-					'count': Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count(),
-					'graph_data': "filler",
-			}
+			count = {'label': label, 'count': Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count()}
 			json_count_results.append(count)
+			data_points = [label]
 
-
-
-
+			for i in range(7):
+				if i == 6:
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week_by_day[i]).count()
+					data_points.append(data_point)
+				else:
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(last_week_by_day[i], last_week_by_day[i+1])).count()
+					data_points.append(data_point)	
+			columns.append(data_points)
 
 	elif time_period == "month":
+		x_axis = ['x'] + last_month_by_day
+		columns.append(x_axis)
 		for label in labels:
 			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}
 			json_count_results.append(count)
+			data_points = [label]
 
-	return jsonify(counts=json_count_results, time_period = time_period)
+			for i in range(30):
+				if i == 29:
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week_by_day[i]).count()
+					data_points.append(data_point)
+				else:
+					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(last_week_by_day[i], last_week_by_day[i+1])).count()
+					data_points.append(data_point)	
+			columns.append(data_points)
+
+	return jsonify(time_period = time_period, counts=json_count_results, columns = columns)
 
 
 if __name__ == "__main__":
