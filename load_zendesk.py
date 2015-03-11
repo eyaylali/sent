@@ -13,11 +13,10 @@ def main(jsonfile):
 	for review in content["Reviews"]:
 
 		new_ticket = {
-	    	'ticket': {
-	    	# 'source':{'channel': 'api'}
-	        'requester':{'name': review["Author"].encode('ascii','ignore'),'email': 'name@gmail.com.com'},
-	        'subject':review["Title"].encode('ascii','ignore'),
-	        'comment': {'body':review["Content"].encode('ascii','ignore')}
+	    	"ticket": {
+	        "requester": {"name": review["Author"].encode('ascii','ignore'), "email": "name@gmail.com.com"},
+	        "subject": review["Title"].encode('ascii','ignore'),
+	        "comment": {"body":review["Content"].encode('ascii','ignore')}
     }
 }
 		# Create the ticket and get its URL

@@ -19,7 +19,6 @@ classifier = joblib.load('train/classifier.pickle')
 
 def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 	existing_users = User.list_user_ids(User)
-	print existing_users
 	for user in user_dict["users"]:
 		#check to see if ticket author is already in database
 		zendesk_user_id = int(user["id"])
@@ -43,17 +42,20 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 		user_tickets = zendesk.user_tickets_requested(zendesk_user_id)
 		print user_tickets
 		#Find the last ticket id of messages already in DB in order to determine which messages to add (ticket ids increment by 1)
-		threshold_id = Ticket.query.order_by(Ticket.ticket_id).first()
+		# threshold_id = Ticket.query.order_by(Ticket.ticket_id).first()
 		added_tickets = []
 		for ticket in user_tickets["tickets"]:
 			if ticket["status"] == "open" or ticket["status"] == "pending":
 				ticket_id = int(ticket["id"])
 
 				#if the ticket_id of the ticket to be added is less than or equal to the threshold, don't add it
-				if threshold_id:
-					if ticket_id not in added_tickets:
-						if ticket_id <= threshold_id:
-							continue
+				# if threshold_id:
+				# 	if ticket_id not in added_tickets:
+				# 		if ticket_id <= threshold_id:
+				# 			continue
+				if ticket_id in added_tickets:
+					continue
+
 
 				subject = ticket["subject"]
 				content = ticket["description"]
@@ -83,7 +85,7 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 									  sentiment_label = label)
 				session.add(ticket)
 				session.commit()
-				session.refresh(user)
+				session.refresh(ticket)
 				added_tickets.append(ticket_id)
 
 def predict_sentiment_label(all_content):
