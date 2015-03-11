@@ -1,5 +1,40 @@
 /** @jsx React.DOM */
 
+var PieGraph = React.createClass({
+  componentDidMount: function() {
+    console.log(this.props.sourceData)
+    this.chart = c3.generate({
+      bindto: this.refs.myPie.getDOMNode(),
+    data: {
+        columns: this.props.sourceData.total,
+        type : 'donut',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    },
+    donut: {
+        title: "Source"
+    }
+  });
+  },
+  updatePie: function () {
+    this.chart.load({
+    columns: this.props.sourceData.total,
+    });
+  },
+  componentDidUpdate: function (prevProps, prevState) {
+      if (prevProps.sourceData.total !== this.props.sourceData.total) {
+      this.updateGraph();
+    } 
+  },
+  render: function() {
+    return (
+      <div ref="myPie">
+      </div>
+     );
+  }
+});
+
 var SentimentGraph = React.createClass({
   componentDidMount: function() {
     this.chart = c3.generate({
@@ -45,7 +80,9 @@ var SentimentGraph = React.createClass({
   },
   render: function() {
     return (
-      <div ref="myContainer">
+      <div>
+      <div ref="myContainer"></div>
+      <PieGraph {...this.state} />
       </div>
      );
   }
@@ -71,7 +108,7 @@ var SentimentCounterList = React.createClass({
           dataType: 'json',
           type: 'get',
           success: function(data) {
-              this.setState({data: data.counts, timePeriod : data.time_period, columns : data.columns});
+              this.setState({data: data.counts, timePeriod : data.time_period, columns : data.columns, sourceData : data.source_data});
           }.bind(this),
           error: function(xhr, status, err) {
           console.error(this.props.source, status, err.toString());

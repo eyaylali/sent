@@ -2,11 +2,9 @@
 
 var TicketAccordion = React.createClass({
   render: function() {
-//  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
-//  	var date = moment(this.props.date)
     return (
     	<tr className="warning">
-    		<td colSpan="5">{this.props.ticket.content}</td>
+    		<td colSpan="6">{this.props.ticket.content}</td>
     	</tr>
     	);
   }
@@ -25,10 +23,12 @@ var Ticket = React.createClass({
 	    		<td>{this.props.ticket.user_name}</td>
 	    		<td onClick={this.props.handleAccordions}>{this.props.ticket.subject}</td>
 	    		<td>{this.props.ticket.date}</td>
+	    		<td></td>
 	    	</tr>
 	    	);
   }
 });
+
 
 var TicketList = React.createClass({
   	render: function() {
@@ -95,6 +95,7 @@ var TicketList = React.createClass({
 	        		<th>Customer Name</th>
 	        		<th>Subject</th>
 	        		<th>Date</th>
+	        		<th>Reply</th>
 	        	</tr>
 	        	</thead>
 	        	<tbody>

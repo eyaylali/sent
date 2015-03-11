@@ -149,6 +149,21 @@ def counts():
 	labels = ["upset", "neutral", "positive"]
 	json_count_results = []
 	columns = []
+	source_data = []
+	org_data = []
+	source_options = ["api", "twitter", "facebook", "email"]
+
+	#to get all message breakdowns by source
+
+	all_source_data = []
+	for source in source_options:
+		single_source_data = [source]
+		count = Ticket.query.filter(Ticket.source == source).count()
+		single_source_data.append(count)
+		all_source_data.append(single_source_data)
+
+	d = {"total": all_source_data}
+	source_data.append(d)
 
 	if time_period == "today":
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]
@@ -158,6 +173,7 @@ def counts():
 			json_count_results.append(count)
 			data_points = [label]
 
+			#line graph data points
 			for i in range(len(today_by_hour)):
 				if i == (len(today_by_hour) - 1):
 					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > today_by_hour[i]).count()
@@ -166,6 +182,17 @@ def counts():
 					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(today_by_hour[i], today_by_hour[i+1])).count()
 					data_points.append(data_point)	
 			columns.append(data_points)
+
+			all_source_data = []
+			for source in source_options:
+				single_source_data = [source]
+				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_day).count()
+				single_source_data.append(count)
+				all_source_data.append(single_source_data)
+				print all_source_data
+
+			d = {label: all_source_data}
+			source_data.append(d)
 
 	if time_period == "week":
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_week_by_day]
@@ -184,6 +211,16 @@ def counts():
 					data_points.append(data_point)	
 			columns.append(data_points)
 
+			all_source_data = []
+			for source in source_options:
+				single_source_data = [source]
+				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_week).count()
+				single_source_data.append(count)
+				all_source_data.append(single_source_data)
+
+			d = {label: all_source_data}
+			source_data.append(d)
+
 	if time_period == "month":
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_month_by_day]
 		columns.append(x_axis)
@@ -201,7 +238,18 @@ def counts():
 					data_points.append(data_point)	
 			columns.append(data_points)
 
-	return jsonify(time_period = time_period, counts=json_count_results, columns = columns)
+			all_source_data = []
+			for source in source_options:
+				single_source_data = [source]
+				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_month).count()
+				single_source_data.append(count)
+				all_source_data.append(single_source_data)
+
+			d = {label: all_source_data}
+			source_data.append(d)
+	print source_data
+
+	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data)
 
 
 if __name__ == "__main__":

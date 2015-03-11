@@ -10,9 +10,10 @@ from sklearn.externals import joblib
 from train import train
  
 zendesk = Zendesk("https://sent.zendesk.com", os.environ["EMAIL"], os.environ["PASSWORD"])
-TICKETS = zendesk.tickets_list()
+
 USERS = zendesk.users_list()
 ORGANIZATIONS = zendesk.organizations_list()
+print ORGANIZATIONS
 
 # load the saved pipeline that includes vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')

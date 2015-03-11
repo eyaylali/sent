@@ -44,7 +44,6 @@ class User(Base):
 	email = Column(String(100))
 	organization_name = Column(String, nullable = True)
 
-	# organization = relationship("Organization", backref=backref("users", order_by=id))
 
 	@classmethod
 	def list_user_ids(cls, self):
