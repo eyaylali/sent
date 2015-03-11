@@ -10,7 +10,7 @@ import json
 #CONNECTION TO DB
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sent.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///senti.db'
 db = SQLAlchemy(app)
 
 class Ticket(db.Model):
@@ -24,7 +24,6 @@ class Ticket(db.Model):
 	subject = db.Column(db.String(200))
 	content = db.Column(db.String(3000))
 	status = db.Column(db.String(64))
-	url = db.Column(db.String(300))
 	source = db.Column(db.String(64))
 	sentiment_label = db.Column(db.String(64))
 	user = db.relationship("User", backref=db.backref("tickets", order_by=id))

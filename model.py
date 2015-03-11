@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PickleType
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 
-ENGINE = create_engine("sqlite:///sent.db", echo=False)
+ENGINE = create_engine("sqlite:///senti.db", echo=False)
 session = scoped_session(sessionmaker(bind=ENGINE,
 									  autocommit = False,
 									  autoflush = False))
@@ -24,7 +24,6 @@ class Ticket(Base):
 	subject = Column(String(200))
 	content = Column(String(3000))
 	status = Column(String(64))
-	url = Column(String(300))
 	source = Column(String(64))
 	priority = Column(Integer)
 	sentiment_label = Column(String(64))
@@ -46,6 +45,12 @@ class User(Base):
 	organization_name = Column(String, nullable = True)
 
 	# organization = relationship("Organization", backref=backref("users", order_by=id))
+
+	@classmethod
+	def list_user_ids(cls, self):
+		all_users = cls.query.all()
+		return [user.zendesk_user_id for user in all_users]
+
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
