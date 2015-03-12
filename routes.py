@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, request, g, jsonify, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, update, between
 import model
-from model import session
+from model import session, User
 from datetime import datetime, date, timedelta
 import json
 
@@ -150,11 +150,9 @@ def counts():
 	json_count_results = []
 	columns = []
 	source_data = {}
-	customer_data = []
+	customer_data = {}
 	source_options = ["api", "twitter", "facebook"]
-	# customer_types = User.query(User.organization_name).distinct()
-	customer_types = ["driver", "paying customer", "non-paying customer", "other"]
-	
+	customer_types = User.list_user_organizations() #call class method on User to get unique list of organizations
 
 	#function to get ticket source breakdowns
 	def get_source_data(label, time_param):
@@ -174,13 +172,23 @@ def counts():
 
 		source_data[label] = all_source_data
 
-	# def get_customer_data(label, time_param):
-	# 	all_customer_data = []
-	# 	for customer_type in customer_types:
 
-	# 		if label == "total":
-	# 			count = Ticket.query.filter(Ticket.source == source, Ticket.timestamp > time_param).count()
+	def get_customer_data(label, time_param):
+		all_customer_data = []
+		for customer_type in customer_types:
+			if customer_type == None:
+				single_type_data = ["other"]
+			else:
+				single_type_data = [customer_type]
 
+			if label == "total":
+				count = sum_tickets_by_org_name(customer_type)
+			else:
+				count = sum_tickets_by_org_name(customer_type, time_param)
+			single_type_data.append(count)
+			all_customer_data.append(single_type_data)
+
+		customer_data[label] = all_customer_data
 
 	if time_period == "today":
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]

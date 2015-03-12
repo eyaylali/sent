@@ -23,7 +23,7 @@ var Ticket = React.createClass({
 	    		<td>{this.props.ticket.user_name}</td>
 	    		<td onClick={this.props.handleAccordions}>{this.props.ticket.subject}</td>
 	    		<td>{this.props.ticket.date}</td>
-	    		<td></td>
+	    		<td><a href= {zdesk_url}><span className="glyphicon glyphicon-send" aria-hidden="true"></span></a></td>
 	    	</tr>
 	    	);
   }

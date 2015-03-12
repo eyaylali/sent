@@ -19,7 +19,7 @@ print ORGANIZATIONS
 classifier = joblib.load('train/classifier.pickle')
 
 def unpack_zendesk_users_tickets(session, user_dict, org_dict):
-	existing_users = User.list_user_ids(User)
+	existing_users = User.list_user_ids()
 	for user in user_dict["users"]:
 		#check to see if ticket author is already in database
 		zendesk_user_id = int(user["id"])

@@ -44,16 +44,31 @@ class User(Base):
 	email = Column(String(100))
 	organization_name = Column(String, nullable = True)
 
+	@property 
+	def num_tickets(self):
+		return len(self.tickets)
 
 	@classmethod
-	def list_user_ids(cls, self):
+	def sum_tickets_by_org_name(cls, org_name, time_param):
+		num_tickets = 0
+		for user in cls.query.filter_by(organization_name = org_name).filter(tickets.timestamp > time_param).all():
+			num_tickets += user.num_tickets
+		return num_tickets
+
+	@classmethod
+	def list_user_ids(cls):
 		all_users = cls.query.all()
 		return [user.zendesk_user_id for user in all_users]
+
+	@classmethod
+	def list_user_organizations(cls):
+		all_users = cls.query.all()
+		return set([user.organization_name for user in all_users])
 
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
-		pass
+		return "This is a user"
 
 ### End class declarations
 
