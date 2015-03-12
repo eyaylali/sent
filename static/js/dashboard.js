@@ -2,15 +2,11 @@
 
 var PieGraph = React.createClass({
   componentDidMount: function() {
-    console.log(this.props.sourceData)
     this.chart = c3.generate({
       bindto: this.refs.myPie.getDOMNode(),
     data: {
-        columns: this.props.sourceData.total,
+        columns: [],
         type : 'donut',
-        onclick: function (d, i) { console.log("onclick", d, i); },
-        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
     },
     donut: {
         title: "Source"
@@ -19,30 +15,36 @@ var PieGraph = React.createClass({
   },
   updatePie: function () {
     this.chart.load({
-    columns: this.props.sourceData.total,
+    columns: this.props.chartData[this.props.sentimentType],
     });
   },
-  componentDidUpdate: function (prevProps, prevState) {
-      if (prevProps.sourceData.total !== this.props.sourceData.total) {
-      this.updateGraph();
-    } 
+  componentDidUpdate: function (prevProps) {
+      if (prevProps.chartData !== this.props.chartData || prevProps.sentimentType !== this.props.sentimentType) {
+        this.updatePie()
+        console.log("data changed!");
+      }
   },
   render: function() {
     return (
-      <div ref="myPie">
-      </div>
+      <div ref="myPie"></div>
      );
   }
 });
 
 var SentimentGraph = React.createClass({
+  getInitialState: function() {
+    return {
+    sentimentType: "total"
+    }
+  },
   componentDidMount: function() {
     this.chart = c3.generate({
       bindto: this.refs.myContainer.getDOMNode(),
     data: {
         x: 'x',
         xFormat: "%Y-%m-%d %H:%M:%S",
-        columns: this.props.columns
+        columns: this.props.columns,
+        onclick: function (d) { this.handleSeriesClick(d.id) }.bind(this),
     },
     axis: {
         x: {
@@ -59,6 +61,15 @@ var SentimentGraph = React.createClass({
       },
     }
 });
+  },
+  handleSeriesClick: function(seriesId) {
+    var newSentimentType;
+    if (this.state.sentimentType === seriesId) {
+      newSentimentType = "total";
+    } else {
+      newSentimentType = seriesId;
+    }
+    this.setState({sentimentType:newSentimentType});
   },
   updateGraph: function () {
     this.chart.load({
@@ -82,7 +93,8 @@ var SentimentGraph = React.createClass({
     return (
       <div>
       <div ref="myContainer"></div>
-      <PieGraph {...this.state} />
+      <PieGraph chartData={this.props.sourceData} sentimentType = {this.state.sentimentType}/>
+      <PieGraph chartData={this.props.customerData} sentimentType = {this.state.sentimentType}/>
       </div>
      );
   }

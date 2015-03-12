@@ -149,7 +149,7 @@ def counts():
 	labels = ["upset", "neutral", "positive"]
 	json_count_results = []
 	columns = []
-	source_data = []
+	source_data = {}
 	org_data = []
 	source_options = ["api", "twitter", "facebook", "email"]
 
@@ -162,8 +162,7 @@ def counts():
 		single_source_data.append(count)
 		all_source_data.append(single_source_data)
 
-	d = {"total": all_source_data}
-	source_data.append(d)
+	source_data["total"] = all_source_data
 
 	if time_period == "today":
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]
@@ -189,10 +188,8 @@ def counts():
 				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_day).count()
 				single_source_data.append(count)
 				all_source_data.append(single_source_data)
-				print all_source_data
 
-			d = {label: all_source_data}
-			source_data.append(d)
+			source_data[label] = all_source_data
 
 	if time_period == "week":
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_week_by_day]
@@ -214,12 +211,11 @@ def counts():
 			all_source_data = []
 			for source in source_options:
 				single_source_data = [source]
-				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_week).count()
+				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_day).count()
 				single_source_data.append(count)
 				all_source_data.append(single_source_data)
 
-			d = {label: all_source_data}
-			source_data.append(d)
+			source_data[label] = all_source_data
 
 	if time_period == "month":
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_month_by_day]
@@ -241,12 +237,11 @@ def counts():
 			all_source_data = []
 			for source in source_options:
 				single_source_data = [source]
-				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_month).count()
+				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > last_day).count()
 				single_source_data.append(count)
 				all_source_data.append(single_source_data)
 
-			d = {label: all_source_data}
-			source_data.append(d)
+			source_data[label] = all_source_data
 	print source_data
 
 	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data)
