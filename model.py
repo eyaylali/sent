@@ -49,10 +49,10 @@ class User(Base):
 		return len(self.tickets)
 
 	@classmethod
-	def sum_tickets_by_org_name(cls, org_name, time_param):
+	def sum_tickets_by_org_name(cls, org_param, time_param):
 		num_tickets = 0
-		for user in cls.query.filter_by(organization_name = org_name).filter(tickets.timestamp > time_param).all():
-			num_tickets += user.num_tickets
+		for user in cls.query.filter_by(organization_name=org_param).join(Ticket).filter(Ticket.timestamp > time_param).all()
+			num_tickets += user.num_tickets(time_param)
 		return num_tickets
 
 	@classmethod

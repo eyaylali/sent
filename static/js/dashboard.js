@@ -119,12 +119,13 @@ var SentimentCounterList = React.createClass({
           dataType: 'json',
           type: 'get',
           success: function(data) {
-              this.setState({data: data.counts, timePeriod : data.time_period, columns : data.columns, sourceData : data.source_data, customerData : data.customer_data});
+              this.setState({data: data.counts, timePeriod : data.time_period, columns : data.columns, sourceData : data.source_data});
           }.bind(this),
           error: function(xhr, status, err) {
           console.error(this.props.source, status, err.toString());
         }.bind(this)
       });
+      console.log(this.state);
   },
   componentDidMount: function() {
     this.loadCountsFromServer();
