@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, request, g, jsonify, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, update, between
 import model
-from model import session, User
+from model import session
 from datetime import datetime, date, timedelta
 import json
 
@@ -114,45 +114,16 @@ def tickets(label):
 def counts():
 
 	time_period = request.args.get('time')
-	
 	today = datetime.now()
-	last_day = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-	last_week = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-	last_month = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-
-	#initializing lists to use during querying for graph data points
-	today_by_hour = []
-	last_week_by_day = []
-	last_month_by_day = []
-
-	#create a list of all hours in a day to query for
-	hour = last_day
-	this_hour = today.hour
-	for each_hour in range(this_hour):
-		hour = hour + timedelta(hours = 1)
-		today_by_hour.append(hour)
-
-	#create a list of all days of a week to query for
-	day = last_week
-	for each_day in range(7):
-		day = day + timedelta(days = 1)
-		last_week_by_day.append(day)
-
-	#create a list of all days of a month to query for
-	day = last_month
-	for each_day in range(30):
-		day = day + timedelta(days = 1)
-		last_month_by_day.append(day)
-
-	# Query and collect data for each sentiment for the given time_range
-
-	labels = ["upset", "neutral", "positive"]
+	
+	# Query and collect data for each sentiment for the given time range
 	json_count_results = []
 	columns = []
 	source_data = {}
 	customer_data = {}
+	labels = ["upset", "neutral", "positive"]
 	source_options = ["api", "twitter", "facebook"]
-	customer_types = User.list_user_organizations() #call class method on User to get unique list of organizations
+	customer_types = model.User.list_user_organizations() #call class method on User to get unique list of organizations
 
 	#function to get ticket source breakdowns
 	def get_source_data(label, time_param):
@@ -172,7 +143,7 @@ def counts():
 
 		source_data[label] = all_source_data
 
-
+	#function to get ticket counts per author organization
 	def get_customer_data(label, time_param):
 		all_customer_data = []
 		for customer_type in customer_types:
@@ -181,16 +152,23 @@ def counts():
 			else:
 				single_type_data = [customer_type]
 
-			if label == "total":
-				count = sum_tickets_by_org_name(customer_type)
-			else:
-				count = sum_tickets_by_org_name(customer_type, time_param)
+			count = model.User.sum_tickets_by_org_name(customer_type, time_param, label)
+
 			single_type_data.append(count)
 			all_customer_data.append(single_type_data)
 
 		customer_data[label] = all_customer_data
 
 	if time_period == "today":
+		last_day = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		#create a list of all hours in a day to query for
+		today_by_hour = []
+		hour = last_day
+		this_hour = today.hour
+		for each_hour in range(this_hour):
+			hour = hour + timedelta(hours = 1)
+			today_by_hour.append(hour)
+
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]
 		columns.append(x_axis)
 		for label in labels:
@@ -210,9 +188,19 @@ def counts():
 
 			#pie graph data
 			get_source_data(label, last_day)
+			get_customer_data(label, last_day)
 		get_source_data("total", last_day)
+		get_customer_data("total", last_day)
 
 	if time_period == "week":
+		last_week = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		#create a list of all days of a week to query for
+		last_week_by_day = []
+		day = last_week
+		for each_day in range(7):
+			day = day + timedelta(days = 1)
+			last_week_by_day.append(day)
+
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_week_by_day]
 		columns.append(x_axis)
 		for label in labels:
@@ -230,9 +218,20 @@ def counts():
 			columns.append(data_points)
 
 			get_source_data(label, last_week)
+			get_customer_data(label, last_week)
 		get_source_data("total", last_week)
+		get_customer_data("total", last_week)
 
 	if time_period == "month":
+		last_month = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		#create a list of all days of a month to query for
+		last_month_by_day = []
+		day = last_month
+		for each_day in range(30):
+			day = day + timedelta(days = 1)
+			last_month_by_day.append(day)
+
+
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_month_by_day]
 		columns.append(x_axis)
 		for label in labels:
@@ -250,9 +249,14 @@ def counts():
 			columns.append(data_points)
 
 			get_source_data(label, last_month)
-		get_source_data("today", last_month)
+			get_customer_data(label, last_month)
+		get_source_data("total", last_month)
+		get_customer_data("total", last_month)
 
-	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data)
+	print "SOURCE DATA", source_data
+	print "CUSTOMER_DATA", customer_data
+
+	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data, customer_data = customer_data)
 
 
 if __name__ == "__main__":

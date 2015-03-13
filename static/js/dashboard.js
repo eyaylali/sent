@@ -94,6 +94,7 @@ var SentimentGraph = React.createClass({
       <div>
       <div ref="myContainer"></div>
       <PieGraph chartData={this.props.sourceData} sentimentType = {this.state.sentimentType}/>
+      <PieGraph chartData={this.props.customerData} sentimentType = {this.state.sentimentType}/>
       </div>
      );
   }
@@ -111,7 +112,7 @@ var SentimentCounter = React.createClass({
 
 var SentimentCounterList = React.createClass({
   getInitialState: function() {
-    return {data: [], timePeriod: this.props.timePeriod, columns: []};
+    return {data: [], timePeriod: this.props.timePeriod, columns: [], customerData: [], sourceData: []};
   },
   loadCountsFromServer: function() {
       $.ajax({
@@ -119,13 +120,12 @@ var SentimentCounterList = React.createClass({
           dataType: 'json',
           type: 'get',
           success: function(data) {
-              this.setState({data: data.counts, timePeriod : data.time_period, columns : data.columns, sourceData : data.source_data});
+              this.setState({data: data.counts, timePeriod : data.time_period, columns : data.columns, sourceData : data.source_data, customerData : data.customer_data});
           }.bind(this),
           error: function(xhr, status, err) {
           console.error(this.props.source, status, err.toString());
         }.bind(this)
       });
-      console.log(this.state);
   },
   componentDidMount: function() {
     this.loadCountsFromServer();
@@ -175,7 +175,7 @@ var Dashboard = React.createClass({
       </ul>
       <SentimentCounterList {...this.state} source = {this.props.source}/>
       </div>
-    	);
+      );
   }
 });
 
@@ -184,4 +184,3 @@ React.render(
   <Dashboard source = '/sent/api/data/'/>,
   document.getElementById('analytics-dashboard')
 );
-

@@ -44,16 +44,12 @@ class User(Base):
 	email = Column(String(100))
 	organization_name = Column(String, nullable = True)
 
-	@property 
-	def num_tickets(self):
-		return len(self.tickets)
-
 	@classmethod
-	def sum_tickets_by_org_name(cls, org_param, time_param):
-		num_tickets = 0
-		for user in cls.query.filter_by(organization_name=org_param).join(Ticket).filter(Ticket.timestamp > time_param).all()
-			num_tickets += user.num_tickets(time_param)
-		return num_tickets
+	def sum_tickets_by_org_name(cls, org_param, time_param, label):
+		if label == "total":
+			return len(cls.query.filter_by(organization_name=org_param).join(Ticket).filter(Ticket.timestamp > time_param).all())
+		else:
+			return len(cls.query.filter_by(organization_name=org_param).join(Ticket).filter(Ticket.timestamp > time_param, Ticket.sentiment_label == label).all())
 
 	@classmethod
 	def list_user_ids(cls):
