@@ -17,7 +17,7 @@ var Ticket = React.createClass({
 	  	var ticketId = "ticket_row_" + this.props.ticket.ticket_id;
 	  	var ticketAccordionId = "accordion_row_" + this.props.ticket.ticket_id;
 	    return (
-	    	<tr className="active" id={ticketId} >
+	    	<tr className="active" id={ticketId}>
 	  			<td><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
 	    		<td>{this.props.ticket.sentiment}</td>
 	    		<td>{this.props.ticket.user_name}</td>
@@ -71,7 +71,7 @@ var TicketList = React.createClass({
   			displayTotal = this.props.sentimentCount;
   		};
 	    return (
-	    	<div className="ticketList">
+	    	<div className="ticketList" >
 	        <nav>
 				<ul className="pagination">
 				    <li onClick={this.props.handlePaginationPrevious}>
@@ -87,7 +87,7 @@ var TicketList = React.createClass({
 				</ul>
 			</nav>
 			<p>Viewing {displayStart}-{displayEnd} of {displayTotal}</p>
-	        <table className="table table-bordered table-condensed" >
+	        <table className="table table-striped table-hover" >
 	        	<thead>
 	        	<tr className="active">
 	        		<th>Update?</th>
@@ -117,6 +117,9 @@ var InboxPage = React.createClass({
 			has_next_page: false,
 			total_count: 0,
 			accordions: [],
+			classListPositive: "",
+			classListNeutral: "",
+			classListUpset: ""
 		};
 		
 	},
@@ -164,7 +167,7 @@ var InboxPage = React.createClass({
 					cursor: data.cursor, 
 					has_next_page: data.next_page, 
 					total_count: data.total_count, 
-					sentimentCount: data.sentiment_count
+					sentimentCount: data.sentiment_count,
 				};
                 this.setState(state);
             }.bind(this),
@@ -174,11 +177,33 @@ var InboxPage = React.createClass({
         });
     },
 	handleSentimentStateChange: function (newSentimentType) {
-		return function () {
-    		this.setState({
-    			sentimentType: newSentimentType,
+		var state = {
+				sentimentType: newSentimentType,
     			cursor: 1
-    		})
+    		};
+		if (newSentimentType === "positive") {
+			state.classListPositive = " active";
+			state.classListUpset = "";
+			state.classListNeutral = "";
+			state.classListAll = "";
+		} else if (newSentimentType === "upset") {
+			state.classListPositive = "";
+			state.classListUpset = " active";
+			state.classListNeutral = "";
+			state.classListAll = "";
+		} else if (newSentimentType === "neutral") {
+			state.classListPositive = "";
+			state.classListUpset = "";
+			state.classListNeutral = " active";
+			state.classListAll = "";
+		} else if (newSentimentType === "all") {
+			state.classListPositive = "";
+			state.classListUpset = "";
+			state.classListNeutral = "";
+			state.classListAll = " active";
+		};
+		return function () {
+    		this.setState(state)
     	}.bind(this)
 	},
 	componentDidMount: function () {
@@ -223,36 +248,45 @@ var InboxPage = React.createClass({
     },
   	render: function() {
   		var grandTotal = this.state.total_count[0] + this.state.total_count[1] + this.state.total_count[2];
+  		var allClass = this.state.classListAll + " list-group-item";
+  		var upsetClass = this.state.classListUpset + " list-group-item";
+  		var positiveClass = this.state.classListPositive + " list-group-item";
+  		var neutralClass = this.state.classListNeutral + " list-group-item";
     return (
     	<div className= "container">
-    		<div className = "controller">
-    			<select ref = "controlSelect">
-    				<option value="upset">Upset</option>
-    				<option value="neutral">Neutral</option>
-    				<option value="positive">Positive</option>
-    			</select>
-    			<button onClick= {this.handleSentimentChange}>Update</button>
-    		</div>
+    	<div className = "row">
+    		
 		    <ul className="list-group" className="col-md-3">
-		    	<li onClick={this.handleSentimentStateChange("all")} className="list-group-item">
+		    	<li onClick={this.handleSentimentStateChange("all")} className={allClass}>
 			    	<span className="badge">{grandTotal}</span>
 			    All
 			  	</li>
-			  	<li onClick={this.handleSentimentStateChange("upset")} className="list-group-item">
+			  	<li onClick={this.handleSentimentStateChange("upset")} className={upsetClass}>
 			    	<span className="badge">{this.state.total_count[0]}</span>
 			    Upset
 			  	</li>
-			  	<li onClick={this.handleSentimentStateChange("neutral")} className="list-group-item">
+			  	<li onClick={this.handleSentimentStateChange("neutral")} className={neutralClass}>
 			    	<span className="badge">{this.state.total_count[1]}</span>
 			    Neutral
 			  	</li>
-			  	<li onClick={this.handleSentimentStateChange("positive")} className="list-group-item">
+			  	<li onClick={this.handleSentimentStateChange("positive")} className={positiveClass}>
 			    	<span className="badge">{this.state.total_count[2]}</span>
 			    Positive
 			  	</li>
 			</ul>
-		    <TicketList getHandleAccordions= {this.getHandleAccordions} getHandleTicketSelection= {this.getHandleTicketSelection} handlePaginationNext={this.handlePaginationNext} handlePaginationPrevious={this.handlePaginationPrevious} 
-		    	{...this.state} />
+			<div className="col-md-9">
+				<div className = "controller">
+	    			<select ref = "controlSelect">
+	    				<option value="upset">Upset</option>
+	    				<option value="neutral">Neutral</option>
+	    				<option value="positive">Positive</option>
+	    			</select>
+	    			<button onClick= {this.handleSentimentChange}>Update</button>
+	    		</div>
+			    <TicketList getHandleAccordions= {this.getHandleAccordions} getHandleTicketSelection= {this.getHandleTicketSelection} handlePaginationNext={this.handlePaginationNext} handlePaginationPrevious={this.handlePaginationPrevious} 
+			    	{...this.state} />
+			    </div>	
+		    </div>	
     	</div>
     	);
 

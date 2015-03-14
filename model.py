@@ -27,8 +27,14 @@ class Ticket(Base):
 	source = Column(String(64))
 	priority = Column(Integer)
 	sentiment_label = Column(String(64))
+	# update_date = Column(DateTime)
 
 	user = relationship("User", backref=backref("tickets", order_by=id))
+
+	@classmethod
+	def list_changed_tickets(cls, update_date):
+		all_changed_tickets = cls.query.filter(Ticket.update_date > update_date).all()
+		return all_changed_tickets
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)

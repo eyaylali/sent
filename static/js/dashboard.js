@@ -93,8 +93,8 @@ var SentimentGraph = React.createClass({
     return (
       <div>
       <div ref="myContainer"></div>
+      <PieGraph chartData={this.props.sourceData} sentimentType = "total"/>
       <PieGraph chartData={this.props.sourceData} sentimentType = {this.state.sentimentType}/>
-      <PieGraph chartData={this.props.customerData} sentimentType = {this.state.sentimentType}/>
       </div>
      );
   }

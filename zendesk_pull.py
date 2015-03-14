@@ -8,6 +8,8 @@ import os
 import sys
 from sklearn.externals import joblib
 from train import train
+import pickle
+import numpy as np
  
 zendesk = Zendesk("https://sent.zendesk.com", os.environ["EMAIL"], os.environ["PASSWORD"])
 
@@ -17,6 +19,26 @@ print ORGANIZATIONS
 
 # load the saved pipeline that includes vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')
+last_update = pickle.load(open('last_update_time.p', 'rb'))
+today = datetime.now()
+
+sentiment_changed_tickets = Ticket.list_changed_tickets(today)
+def learn_new_data():
+	X_data = []
+	y_labels = []
+	for ticket in sentiment_changed_tickets:
+		ticket_title = ticket.subject
+		ticket_content = ticket.content
+		ticket_label = ticket.sentiment_label
+		all_content = ticket_title + ticket_content
+		X_data.append(all_content)
+		y_labels.append(ticket_label)
+	X_data = np.array(X_data)
+	y_labels = np.array(y_labels)
+	classes = np.array(["positive", "upset", "neutral"])
+	classifier.partial_fit(X_data, y_labels, classes)
+	pickle.dump(today, open('last_update_time.p', 'wb'))
+
 
 def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 	existing_users = User.list_user_ids()
@@ -83,7 +105,8 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 									  status = status, 
 									  source = source,
 									  priority = priority, 
-									  sentiment_label = label)
+									  sentiment_label = label,
+									  update_date = update_date)
 				session.add(ticket)
 				session.commit()
 				session.refresh(ticket)

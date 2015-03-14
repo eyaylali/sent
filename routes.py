@@ -59,6 +59,7 @@ def update_ticket_sentiment():
 
 	for ticket_num in changing_tickets:
 		session.query(Ticket).filter(Ticket.ticket_id == ticket_num).update({"sentiment_label" : target_sentiment})
+		session.query(Ticket).filter(Ticket.ticket_id == ticket_num).update({"update_date" : datetime.now()})
 		session.commit()
 
 	js = json.dumps({"status":"success"})
@@ -120,11 +121,9 @@ def counts():
 	json_count_results = []
 	columns = []
 	source_data = {}
-	customer_data = {}
 	labels = ["upset", "neutral", "positive"]
 	source_options = ["api", "twitter", "facebook"]
-	customer_types = model.User.list_user_organizations() #call class method on User to get unique list of organizations
-
+	
 	#function to get ticket source breakdowns
 	def get_source_data(label, time_param):
 		all_source_data = []
@@ -142,22 +141,6 @@ def counts():
 			all_source_data.append(single_source_data)
 
 		source_data[label] = all_source_data
-
-	#function to get ticket counts per author organization
-	def get_customer_data(label, time_param):
-		all_customer_data = []
-		for customer_type in customer_types:
-			if customer_type == None:
-				single_type_data = ["other"]
-			else:
-				single_type_data = [customer_type]
-
-			count = model.User.sum_tickets_by_org_name(customer_type, time_param, label)
-
-			single_type_data.append(count)
-			all_customer_data.append(single_type_data)
-
-		customer_data[label] = all_customer_data
 
 	if time_period == "today":
 		last_day = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
@@ -188,9 +171,7 @@ def counts():
 
 			#pie graph data
 			get_source_data(label, last_day)
-			get_customer_data(label, last_day)
 		get_source_data("total", last_day)
-		get_customer_data("total", last_day)
 
 	if time_period == "week":
 		last_week = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
@@ -218,9 +199,7 @@ def counts():
 			columns.append(data_points)
 
 			get_source_data(label, last_week)
-			get_customer_data(label, last_week)
 		get_source_data("total", last_week)
-		get_customer_data("total", last_week)
 
 	if time_period == "month":
 		last_month = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
@@ -249,14 +228,11 @@ def counts():
 			columns.append(data_points)
 
 			get_source_data(label, last_month)
-			get_customer_data(label, last_month)
 		get_source_data("total", last_month)
-		get_customer_data("total", last_month)
 
 	print "SOURCE DATA", source_data
-	print "CUSTOMER_DATA", customer_data
 
-	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data, customer_data = customer_data)
+	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data)
 
 
 if __name__ == "__main__":
