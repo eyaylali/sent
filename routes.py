@@ -13,30 +13,30 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///senti.db'
 db = SQLAlchemy(app)
 
-class Ticket(db.Model):
-	__tablename__ = "tickets"
-	id = db.Column(db.Integer, primary_key = True)
-	ticket_id = db.Column(db.Integer)
-	user_id = db.Column(db.Integer, db.ForeignKey('users.zendesk_user_id'))
-	submitter_id = db.Column(db.Integer)
-	assignee_id = db.Column(db.Integer)
-	timestamp = db.Column(db.DateTime)
-	subject = db.Column(db.String(200))
-	content = db.Column(db.String(3000))
-	status = db.Column(db.String(64))
-	source = db.Column(db.String(64))
-	sentiment_label = db.Column(db.String(64))
-	user = db.relationship("User", backref=db.backref("tickets", order_by=id))
+# class model.Ticket(db.Model):
+# 	__tablename__ = "model.Tickets"
+# 	id = db.Column(db.Integer, primary_key = True)
+# 	model.Ticket_id = db.Column(db.Integer)
+# 	user_id = db.Column(db.Integer, db.ForeignKey('users.zendesk_user_id'))
+# 	submitter_id = db.Column(db.Integer)
+# 	assignee_id = db.Column(db.Integer)
+# 	timestamp = db.Column(db.DateTime)
+# 	subject = db.Column(db.String(200))
+# 	content = db.Column(db.String(3000))
+# 	status = db.Column(db.String(64))
+# 	source = db.Column(db.String(64))
+# 	sentiment_label = db.Column(db.String(64))
+# 	user = db.relationship("User", backref=db.backref("model.Tickets", order_by=id))
 
-class User(db.Model):
-	__tablename__ = "users"
+# class User(db.Model):
+# 	__tablename__ = "users"
 
-	id = db.Column(db.Integer, primary_key = True)
-	zendesk_user_id = db.Column(db.Integer)
-	role = db.Column(db.String(64))
-	name = db.Column(db.String(100))
-	email = db.Column(db.String(100))
-	organization_name = db.Column(db.String, nullable = True)
+# 	id = db.Column(db.Integer, primary_key = True)
+# 	zendesk_user_id = db.Column(db.Integer)
+# 	role = db.Column(db.String(64))
+# 	name = db.Column(db.String(100))
+# 	email = db.Column(db.String(100))
+# 	organization_name = db.Column(db.String, nullable = True)
 
 #SERVER ROUTES
 
@@ -58,8 +58,11 @@ def update_ticket_sentiment():
 	changing_tickets = request.form.getlist('selections[]')
 
 	for ticket_num in changing_tickets:
-		session.query(Ticket).filter(Ticket.ticket_id == ticket_num).update({"sentiment_label" : target_sentiment})
-		session.query(Ticket).filter(Ticket.ticket_id == ticket_num).update({"update_date" : datetime.now()})
+		tickets = session.query(model.Ticket).filter(model.Ticket.ticket_id == ticket_num)
+		tickets.update({
+			"sentiment_label" : target_sentiment,
+			"update_date" : datetime.now()
+		})
 		session.commit()
 
 	js = json.dumps({"status":"success"})
@@ -75,9 +78,9 @@ def tickets(label):
 		query_qty = 21
 
 		if label == "all":
-			 ticket_results = Ticket.query.order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
+			 ticket_results = model.Ticket.query.order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
 		else:
-	 		ticket_results = Ticket.query.filter(Ticket.sentiment_label == label).order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
+	 		ticket_results = model.Ticket.query.filter(model.Ticket.sentiment_label == label).order_by(model.Ticket.priority).order_by(model.Ticket.timestamp.desc()).offset((page - 1)*display_qty).limit(query_qty).all()
 	 	
 	 	#to check to see if we will need another paginated page after this page
 	 	if len(ticket_results) > 20:
@@ -102,11 +105,11 @@ def tickets(label):
 			}
 			json_results.append(d)
 
-		sentiment_message_count = Ticket.query.filter(Ticket.sentiment_label == label).count()
+		sentiment_message_count = model.Ticket.query.filter(model.Ticket.sentiment_label == label).count()
 		total_message_count = []
 		labels = ["upset", "neutral", "positive"]
 		for each in labels:
-			count = Ticket.query.filter(Ticket.sentiment_label == each).count()
+			count = model.Ticket.query.filter(model.Ticket.sentiment_label == each).count()
 			total_message_count.append(count)
 
 		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count, sentiment_count = sentiment_message_count)
@@ -134,9 +137,9 @@ def counts():
 				single_source_data = [source]
 
 			if label == "total":
-				count = Ticket.query.filter(Ticket.source == source, Ticket.timestamp > time_param).count()
+				count = model.Ticket.query.filter(model.Ticket.source == source, model.Ticket.timestamp > time_param).count()
 			else:
-				count = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.source == source, Ticket.timestamp > time_param).count()
+				count = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.source == source, model.Ticket.timestamp > time_param).count()
 			single_source_data.append(count)
 			all_source_data.append(single_source_data)
 
@@ -155,17 +158,17 @@ def counts():
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]
 		columns.append(x_axis)
 		for label in labels:
-			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_day).count()}
+			count = {'label':label, 'count':model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_day).count()}
 			json_count_results.append(count)
 			data_points = [label]
 
 			#line graph data points
 			for i in range(len(today_by_hour)):
 				if i == (len(today_by_hour) - 1):
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > today_by_hour[i]).count()
+					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > today_by_hour[i]).count()
 					data_points.append(data_point)
 				else:
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(today_by_hour[i], today_by_hour[i+1])).count()
+					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp.between(today_by_hour[i], today_by_hour[i+1])).count()
 					data_points.append(data_point)	
 			columns.append(data_points)
 
@@ -185,16 +188,16 @@ def counts():
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_week_by_day]
 		columns.append(x_axis)
 		for label in labels:
-			count = {'label': label, 'count': Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week).count()}
+			count = {'label': label, 'count': model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_week).count()}
 			json_count_results.append(count)
 			data_points = [label]
 
 			for i in range(7):
 				if i == 6:
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_week_by_day[i]).count()
+					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_week_by_day[i]).count()
 					data_points.append(data_point)
 				else:
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(last_week_by_day[i], last_week_by_day[i+1])).count()
+					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp.between(last_week_by_day[i], last_week_by_day[i+1])).count()
 					data_points.append(data_point)	
 			columns.append(data_points)
 
@@ -214,16 +217,16 @@ def counts():
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_month_by_day]
 		columns.append(x_axis)
 		for label in labels:
-			count = {'label':label, 'count':Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month).count()}
+			count = {'label':label, 'count':model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_month).count()}
 			json_count_results.append(count)
 			data_points = [label]
 
 			for i in range(30):
 				if i == 29:
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp > last_month_by_day[i]).count()
+					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_month_by_day[i]).count()
 					data_points.append(data_point)
 				else:
-					data_point = Ticket.query.filter(Ticket.sentiment_label == label, Ticket.timestamp.between(last_month_by_day[i], last_month_by_day[i+1])).count()
+					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp.between(last_month_by_day[i], last_month_by_day[i+1])).count()
 					data_points.append(data_point)	
 			columns.append(data_points)
 
