@@ -27,7 +27,7 @@ class Ticket(Base):
 	source = Column(String(64))
 	priority = Column(Integer)
 	sentiment_label = Column(String(64))
-	# update_date = Column(DateTime)
+	update_date = Column(DateTime, nullable = True)
 
 	user = relationship("User", backref=backref("tickets", order_by=id))
 

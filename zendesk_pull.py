@@ -19,7 +19,7 @@ print ORGANIZATIONS
 
 # load the saved pipeline that includes vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')
-last_update = pickle.load(open('last_update_time.p', 'rb'))
+# last_update = pickle.load(open('last_update_time.p', 'rb'))
 today = datetime.now()
 
 sentiment_changed_tickets = Ticket.list_changed_tickets(today)
@@ -106,7 +106,7 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 									  source = source,
 									  priority = priority, 
 									  sentiment_label = label,
-									  update_date = update_date)
+									  update_date = timestamp)
 				session.add(ticket)
 				session.commit()
 				session.refresh(ticket)

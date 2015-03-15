@@ -26,7 +26,7 @@ var PieGraph = React.createClass({
   },
   render: function() {
     return (
-      <div ref="myPie"></div>
+      <div id = "myPie" ref="myPie"></div>
      );
   }
 });
@@ -39,7 +39,11 @@ var SentimentGraph = React.createClass({
   },
   componentDidMount: function() {
     this.chart = c3.generate({
-      bindto: this.refs.myContainer.getDOMNode(),
+      bindto: this.refs.myLineGraph.getDOMNode(),
+    size: {
+        height: 400,
+        width: 960
+    },
     data: {
         x: 'x',
         xFormat: "%Y-%m-%d %H:%M:%S",
@@ -48,6 +52,10 @@ var SentimentGraph = React.createClass({
     },
     axis: {
         x: {
+            label: {
+              text: 'Sentiment',
+              position: 'outer-middle'
+            },
             type: 'timeseries',
             tick: {
                 format: this.getFormatDisplay()
@@ -58,7 +66,7 @@ var SentimentGraph = React.createClass({
           text: 'Ticket Count',
           position: 'outer-middle'
         }
-      },
+      }
     }
 });
   },
@@ -92,9 +100,13 @@ var SentimentGraph = React.createClass({
   render: function() {
     return (
       <div>
-      <div ref="myContainer"></div>
-      <PieGraph chartData={this.props.sourceData} sentimentType = "total"/>
-      <PieGraph chartData={this.props.sourceData} sentimentType = {this.state.sentimentType}/>
+      <div className="line-graph col-md-offset-1">
+      <div ref="myLineGraph"></div>
+      </div>
+        <div className="row piecharts">
+          <PieGraph className = "" chartData={this.props.sourceData} sentimentType = "total"/>
+          <PieGraph className = "" chartData={this.props.sourceData} sentimentType = {this.state.sentimentType}/>
+        </div>
       </div>
      );
   }
@@ -102,11 +114,28 @@ var SentimentGraph = React.createClass({
 
 var SentimentCounter = React.createClass({
   render: function() {
-    return (
-      <div className= "box" id = "counter">
-        <p id="countertext">{this.props.sentimentCount.count}</p>
+      if (this.props.sentimentCount.label == "upset") {
+        colorName = "panel panel-danger";
+      } else if (this.props.sentimentCount.label == "neutral") {
+        colorName = "panel panel-warning";
+      } else if (this.props.sentimentCount.label == "positive") {
+        colorName = "panel panel-info";
+      }
+    return ( 
+      <div>
+        <div className="counters col-md-2 col-md-offset-1">
+          <div className={colorName}>
+          <div className="panel-heading">
+            <h3 className="panel-title">{this.props.sentimentCount.label}</h3>
+          </div>
+          <div className="panel-body">
+          {this.props.sentimentCount.count}
+          </div>
       </div>
-      );
+
+    </div>
+    </div>
+    );
   }
 });
 
@@ -144,7 +173,9 @@ var SentimentCounterList = React.createClass({
     };
     return (
       <div>
-      <div className="counterList">
+      <div className="counterList row">
+      <div className="col-md-1">
+      </div>
       {counts}
       </div>
       <SentimentGraph {...this.state}/>
@@ -167,12 +198,13 @@ var Dashboard = React.createClass({
     var timePeriod = this.state.timePeriod;
     return (
       <div className= "container">
-      <ul className="nav nav-tabs">
-        <li onClick={this.handleTimeChange.bind(null,"today")} role="presentation" 
-        className={timePeriod == "today" ? "active" : null}><a href="#">Today</a></li>
-        <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation" className={timePeriod == "week" ? "active" : null}><a href="#">Last Week</a></li>
-        <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation" className={timePeriod == "month" ? "active" : null}><a href="#">Last Month</a></li>
-      </ul>
+        <ul className="nav nav-tabs center">
+          <li onClick={this.handleTimeChange.bind(null,"today")} role="presentation" 
+          className={timePeriod == "today" ? "active" : null}><a href="#">Today</a></li>
+          <li onClick={this.handleTimeChange.bind(null,"week")} role="presentation" className={timePeriod == "week" ? "active" : null}><a href="#">Last Week</a></li>
+          <li onClick={this.handleTimeChange.bind(null,"month")} role="presentation" className={timePeriod == "month" ? "active" : null}><a href="#">Last Month</a></li>
+        </ul>
+
       <SentimentCounterList {...this.state} source = {this.props.source}/>
       </div>
       );

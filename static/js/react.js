@@ -72,36 +72,40 @@ var TicketList = React.createClass({
   		};
 	    return (
 	    	<div className="ticketList" >
-	        <nav>
-				<ul className="pagination">
-				    <li onClick={this.props.handlePaginationPrevious}>
-				    	<a href="#" aria-label="Previous">
-				        	<span aria-hidden="true">&laquo;</span>
-				      	</a>
-				    </li>
-				    <li onClick={this.props.handlePaginationNext}>
-				      	<a href="#" aria-label="Next">
-				        	<span aria-hidden="true">&raquo;</span>
-				      	</a>
-				    </li>
-				</ul>
-			</nav>
-			<p>Viewing {displayStart}-{displayEnd} of {displayTotal}</p>
-	        <table className="table table-striped table-hover" >
-	        	<thead>
-	        	<tr className="active">
-	        		<th>Update?</th>
-	        		<th>Sentiment</th>
-	        		<th>Customer Name</th>
-	        		<th>Subject</th>
-	        		<th>Date</th>
-	        		<th>Reply</th>
-	        	</tr>
-	        	</thead>
-	        	<tbody>
-	        	{tickets}
-	        	</tbody>
-	        </table>
+		    	<div className="row pagination">
+		    		<div className="pagination col-md-offset-10">
+			        <nav>
+						<ul className="pagination">
+						    <li onClick={this.props.handlePaginationPrevious}>
+						    	<a href="#" aria-label="Previous">
+						        	<span aria-hidden="true">&laquo;</span>
+						      	</a>
+						    </li>
+						    <li onClick={this.props.handlePaginationNext}>
+						      	<a href="#" aria-label="Next">
+						        	<span aria-hidden="true">&raquo;</span>
+						      	</a>
+						    </li>
+						</ul>
+					</nav>
+					</div>
+				<p>Viewing {displayStart}-{displayEnd} of {displayTotal}</p>
+				</div>
+		        <table className="table table-striped table-hover" >
+		        	<thead>
+		        	<tr className="active">
+		        		<th>Update?</th>
+		        		<th>Sentiment</th>
+		        		<th>Customer Name</th>
+		        		<th>Subject</th>
+		        		<th>Date</th>
+		        		<th>Reply</th>
+		        	</tr>
+		        	</thead>
+		        	<tbody>
+		        	{tickets}
+		        	</tbody>
+		        </table>
 	      	</div>
     );
   }
@@ -254,39 +258,39 @@ var InboxPage = React.createClass({
   		var neutralClass = this.state.classListNeutral + " list-group-item";
     return (
     	<div className= "container">
-    	<div className = "row">
+    		<div className = "row">
     		
-		    <ul className="list-group" className="col-md-3">
-		    	<li onClick={this.handleSentimentStateChange("all")} className={allClass}>
-			    	<span className="badge">{grandTotal}</span>
-			    All
-			  	</li>
-			  	<li onClick={this.handleSentimentStateChange("upset")} className={upsetClass}>
-			    	<span className="badge">{this.state.total_count[0]}</span>
-			    Upset
-			  	</li>
-			  	<li onClick={this.handleSentimentStateChange("neutral")} className={neutralClass}>
-			    	<span className="badge">{this.state.total_count[1]}</span>
-			    Neutral
-			  	</li>
-			  	<li onClick={this.handleSentimentStateChange("positive")} className={positiveClass}>
-			    	<span className="badge">{this.state.total_count[2]}</span>
-			    Positive
-			  	</li>
-			</ul>
-			<div className="col-md-9">
-				<div className = "controller">
-	    			<select ref = "controlSelect">
-	    				<option value="upset">Upset</option>
-	    				<option value="neutral">Neutral</option>
-	    				<option value="positive">Positive</option>
-	    			</select>
-	    			<button onClick= {this.handleSentimentChange}>Update</button>
-	    		</div>
-			    <TicketList getHandleAccordions= {this.getHandleAccordions} getHandleTicketSelection= {this.getHandleTicketSelection} handlePaginationNext={this.handlePaginationNext} handlePaginationPrevious={this.handlePaginationPrevious} 
-			    	{...this.state} />
+			    <ul className="list-group" className="col-md-3 inbox-nav">
+			    	<li onClick={this.handleSentimentStateChange("all")} href="#" className={allClass}>
+				    	<span className="badge">{grandTotal}</span>
+				    All
+				  	</li>
+				  	<li href="#" onClick={this.handleSentimentStateChange("upset")} className={upsetClass}>
+				    	<span className="badge">{this.state.total_count[0]}</span>
+				    Upset
+				  	</li>
+				  	<li href="#" onClick={this.handleSentimentStateChange("neutral")} className={neutralClass}>
+				    	<span className="badge">{this.state.total_count[1]}</span>
+				    Neutral
+				  	</li>
+				  	<li href="#" onClick={this.handleSentimentStateChange("positive")} className={positiveClass}>
+				    	<span className="badge">{this.state.total_count[2]}</span>
+				    Positive
+				  	</li>
+				</ul>
+				<div className="col-md-9">
+					<div className = "controller">
+		    			<select ref = "controlSelect">
+		    				<option value="upset">Upset</option>
+		    				<option value="neutral">Neutral</option>
+		    				<option value="positive">Positive</option>
+		    			</select>
+		    			<button onClick= {this.handleSentimentChange}>Update</button>
+	    			</div>	
+				    <TicketList getHandleAccordions= {this.getHandleAccordions} getHandleTicketSelection= {this.getHandleTicketSelection} handlePaginationNext={this.handlePaginationNext} handlePaginationPrevious={this.handlePaginationPrevious} 
+				    	{...this.state} />
 			    </div>	
-		    </div>	
+		    </div>
     	</div>
     	);
 
