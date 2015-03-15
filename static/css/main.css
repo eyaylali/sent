@@ -53,6 +53,23 @@
 /*inbox navbar*/
 
 .inbox-nav {
-	margin-top: 100px;
+	margin-top: 117px;
 }
 
+.num-display {
+	margin-top: 30px;
+	margin-right: -50px;
+}
+
+/*.pagination {
+	margin-right: -45px;
+	margin-left: 8px;
+}*/
+
+.ticket-list {
+	margin-top: -9px;
+}
+
+#pagination {
+	margin-right: -200px;
+}

@@ -71,9 +71,10 @@ var TicketList = React.createClass({
   			displayTotal = this.props.sentimentCount;
   		};
 	    return (
-	    	<div className="ticketList" >
-		    	<div className="row pagination">
-		    		<div className="pagination col-md-offset-10">
+	    	<div className="ticket-list" >
+		    	<div className="row" id="pagination">
+		    		<p className="num-display col-md-2 col-md-offset-7">Viewing {displayStart}-{displayEnd} of {displayTotal}</p>
+		    		<div className="pagination-arrows col-md-2">
 			        <nav>
 						<ul className="pagination">
 						    <li onClick={this.props.handlePaginationPrevious}>
@@ -89,7 +90,6 @@ var TicketList = React.createClass({
 						</ul>
 					</nav>
 					</div>
-				<p>Viewing {displayStart}-{displayEnd} of {displayTotal}</p>
 				</div>
 		        <table className="table table-striped table-hover" >
 		        	<thead>
