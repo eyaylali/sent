@@ -53,7 +53,7 @@
 /*inbox navbar*/
 
 .inbox-nav {
-	margin-top: 117px;
+	margin-top: 89px;
 }
 
 .num-display {
@@ -61,15 +61,39 @@
 	margin-right: -50px;
 }
 
-/*.pagination {
-	margin-right: -45px;
-	margin-left: 8px;
-}*/
-
 .ticket-list {
 	margin-top: -9px;
 }
 
 #pagination {
-	margin-right: -200px;
+	margin-right: -230px;
+}
+
+.controller {
+	margin-bottom: -62px;
+}
+
+.messages {
+	margin-top: 30px;
+}
+
+.open-message {
+	background-color: #fafafa;
+	padding-right: 100px;
+}
+
+/*.btn-group {
+  outline: none;
+  border: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+}*/
+
+#message-title {
+	font-weight: bold;
+}
+
+.message-body {
+	margin: 10px 10px;
 }

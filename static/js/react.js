@@ -3,8 +3,12 @@
 var TicketAccordion = React.createClass({
   render: function() {
     return (
-    	<tr className="warning">
-    		<td colSpan="6">{this.props.ticket.content}</td>
+    	<tr className="open-message">
+    		<td colSpan="6">
+    		<p id= "message-title" className="message-body">Message Body:</p>
+    		<p className="message-body">{this.props.ticket.content}</p>
+
+    		</td>
     	</tr>
     	);
   }
@@ -16,8 +20,13 @@ var Ticket = React.createClass({
 	  	var date = moment(this.props.date)
 	  	var ticketId = "ticket_row_" + this.props.ticket.ticket_id;
 	  	var ticketAccordionId = "accordion_row_" + this.props.ticket.ticket_id;
+	  	if (this.props.ticket.sentiment === "upset") {
+	  		ticketColor = "danger";
+	  	} else {
+	  		ticketColor = "active";
+	  	}
 	    return (
-	    	<tr className="active" id={ticketId}>
+	    	<tr className={ticketColor} id={ticketId}>
 	  			<td><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
 	    		<td>{this.props.ticket.sentiment}</td>
 	    		<td>{this.props.ticket.user_name}</td>
@@ -232,8 +241,7 @@ var InboxPage = React.createClass({
     		})
     	};
     },
-    handleSentimentChange: function() {
-    	var newSentiment = this.refs.controlSelect.getDOMNode().value;
+    handleSentimentChange: function(newSentiment) {
     	$.ajax({
             url: this.props.source,
             dataType: 'json',
@@ -278,24 +286,27 @@ var InboxPage = React.createClass({
 				    Positive
 				  	</li>
 				</ul>
-				<div className="col-md-9">
+				<div className="col-md-9 messages">
 					<div className = "controller">
-		    			<select ref = "controlSelect">
-		    				<option value="upset">Upset</option>
-		    				<option value="neutral">Neutral</option>
-		    				<option value="positive">Positive</option>
-		    			</select>
-		    			<button onClick= {this.handleSentimentChange}>Update</button>
-	    			</div>	
+					    <div className="btn-group">
+					      <a className="btn btn-default btn-sm">Update</a>
+					      <a href="#" className="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><span className="caret"></span></a>
+					      <ul className="dropdown-menu">
+					        <li><a href="#" onClick= {this.handleSentimentChange.bind(this, 'upset')}>Upset</a></li>
+					          <li><a href="#" onClick= {this.handleSentimentChange.bind(this, 'neutral')}>Neutral</a></li>
+					        <li><a href="#" onClick= {this.handleSentimentChange.bind(this, 'positive')}>Positive</a></li>
+					      </ul>
+					    </div>
+					</div>	
 				    <TicketList getHandleAccordions= {this.getHandleAccordions} getHandleTicketSelection= {this.getHandleTicketSelection} handlePaginationNext={this.handlePaginationNext} handlePaginationPrevious={this.handlePaginationPrevious} 
 				    	{...this.state} />
 			    </div>	
 		    </div>
     	</div>
     	);
-
   }
 });
+
 var sentiment = $("#ticket-list").attr("data-sentiment");
 React.render(
   <InboxPage sentiment = {sentiment} source = '/sent/api/tickets/' />,

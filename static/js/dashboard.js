@@ -53,7 +53,7 @@ var SentimentGraph = React.createClass({
     axis: {
         x: {
             label: {
-              text: 'Sentiment',
+              text: 'Time',
               position: 'outer-middle'
             },
             type: 'timeseries',
