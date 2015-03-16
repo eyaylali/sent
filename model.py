@@ -1,9 +1,24 @@
+import os
+from flask import Flask
+import psycopg2
 from sqlalchemy.ext.declarative import declarative_base
+from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PickleType
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 
-ENGINE = create_engine("sqlite:///senti.db", echo=False)
+ENGINE = create_engine(
+	# "sqlite:///senti.db", 
+	os.environ['POSTGRES_URL'],
+	echo=False
+)
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['POSTGRES_URL']
+db = SQLAlchemy(app)
+# must manually drop before recreating
+# db.create_all()
+
 session = scoped_session(sessionmaker(bind=ENGINE,
 									  autocommit = False,
 									  autoflush = False))
@@ -44,7 +59,7 @@ class User(Base):
 	__tablename__ = "users"
 
 	id = Column(Integer, primary_key = True)
-	zendesk_user_id = Column(Integer)
+	zendesk_user_id = Column(Integer, unique=True, nullable=False)
 	role = Column(String(64))
 	name = Column(String(100))
 	email = Column(String(100))

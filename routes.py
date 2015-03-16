@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, redirect, request, g, jsonify, url_for, Response
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, update, between
@@ -7,37 +8,8 @@ from datetime import datetime, date, timedelta
 import json
 
 
-#CONNECTION TO DB
-
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///senti.db'
-db = SQLAlchemy(app)
-
-# class model.Ticket(db.Model):
-# 	__tablename__ = "model.Tickets"
-# 	id = db.Column(db.Integer, primary_key = True)
-# 	model.Ticket_id = db.Column(db.Integer)
-# 	user_id = db.Column(db.Integer, db.ForeignKey('users.zendesk_user_id'))
-# 	submitter_id = db.Column(db.Integer)
-# 	assignee_id = db.Column(db.Integer)
-# 	timestamp = db.Column(db.DateTime)
-# 	subject = db.Column(db.String(200))
-# 	content = db.Column(db.String(3000))
-# 	status = db.Column(db.String(64))
-# 	source = db.Column(db.String(64))
-# 	sentiment_label = db.Column(db.String(64))
-# 	user = db.relationship("User", backref=db.backref("model.Tickets", order_by=id))
-
-# class User(db.Model):
-# 	__tablename__ = "users"
-
-# 	id = db.Column(db.Integer, primary_key = True)
-# 	zendesk_user_id = db.Column(db.Integer)
-# 	role = db.Column(db.String(64))
-# 	name = db.Column(db.String(100))
-# 	email = db.Column(db.String(100))
-# 	organization_name = db.Column(db.String, nullable = True)
-
+ 
 #SERVER ROUTES
 
 @app.route("/")
@@ -58,8 +30,7 @@ def update_ticket_sentiment():
 	changing_tickets = request.form.getlist('selections[]')
 
 	for ticket_num in changing_tickets:
-		tickets = session.query(model.Ticket).filter(model.Ticket.ticket_id == ticket_num)
-		tickets.update({
+		session.query(model.Ticket).filter(model.Ticket.ticket_id == ticket_num).update({
 			"sentiment_label" : target_sentiment,
 			"update_date" : datetime.now()
 		})

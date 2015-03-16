@@ -10,7 +10,8 @@ from sklearn.externals import joblib
 from train import train
 import pickle
 import numpy as np
- 
+from time import sleep
+
 zendesk = Zendesk("https://sent.zendesk.com", os.environ["EMAIL"], os.environ["PASSWORD"])
 
 USERS = zendesk.users_list()
@@ -120,4 +121,7 @@ def main(session):
 	unpack_zendesk_users_tickets(session, USERS, ORGANIZATIONS)
     
 if __name__ == "__main__":
-	main(session)
+
+	while True:
+		main(session)
+		sleep(60)
