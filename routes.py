@@ -111,6 +111,7 @@ def counts():
 				count = model.Ticket.query.filter(model.Ticket.source == source, model.Ticket.timestamp > time_param).count()
 			else:
 				count = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.source == source, model.Ticket.timestamp > time_param).count()
+			
 			single_source_data.append(count)
 			all_source_data.append(single_source_data)
 
