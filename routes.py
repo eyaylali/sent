@@ -76,12 +76,33 @@ def tickets(label):
 			}
 			json_results.append(d)
 
-		sentiment_message_count = model.Ticket.query.filter(model.Ticket.sentiment_label == label).count()
+		all_tickets = model.Ticket.list_all_tickets()
+
+		positive_tickets = []
+		upset_tickets = []
+		neutral_tickets = []
 		total_message_count = []
-		labels = ["upset", "neutral", "positive"]
-		for each in labels:
-			count = model.Ticket.query.filter(model.Ticket.sentiment_label == each).count()
-			total_message_count.append(count)
+
+		for ticket in all_tickets:
+			if ticket.sentiment_label == "positive":
+				positive_tickets.append(ticket)
+			elif ticket.sentiment_label == "upset":
+				upset_tickets.append(ticket)
+			elif ticket.sentiment_label == "neutral":
+				neutral_tickets.append(ticket)
+
+		if label == "positive":
+			sentiment_message_count = len(positive_tickets)
+		elif label == "upset":
+			sentiment_message_count = len(upset_tickets)
+		elif label == "neutral":
+			sentiment_message_count = len(neutral_tickets)
+		else:
+			sentiment_message_count = len(positive_tickets) + len(upset_tickets) + len(neutral_tickets)
+
+		total_message_count.append(len(upset_tickets))
+		total_message_count.append(len(neutral_tickets))
+		total_message_count.append(len(positive_tickets))
 
 		return jsonify(items=json_results, cursor = page, next_page = next_page, total_count = total_message_count, sentiment_count = sentiment_message_count)
 
@@ -95,27 +116,8 @@ def counts():
 	json_count_results = []
 	columns = []
 	source_data = {}
-	labels = ["upset", "neutral", "positive"]
+	labels = ["upset", "neutral", "positive", "total"]
 	source_options = ["api", "twitter", "facebook"]
-	
-	#function to get ticket source breakdowns
-	def get_source_data(label, time_param):
-		all_source_data = []
-		for source in source_options:
-			if source == "api":
-				single_source_data = ["email"]
-			else:
-				single_source_data = [source]
-
-			if label == "total":
-				count = model.Ticket.query.filter(model.Ticket.source == source, model.Ticket.timestamp > time_param).count()
-			else:
-				count = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.source == source, model.Ticket.timestamp > time_param).count()
-			
-			single_source_data.append(count)
-			all_source_data.append(single_source_data)
-
-		source_data[label] = all_source_data
 
 	if time_period == "today":
 		datetime_threshold = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
@@ -154,28 +156,26 @@ def counts():
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
 
-
 	#create data points according to timeframe
 	all_tickets = model.Ticket.list_tickets(datetime_threshold)
 		
-	#pie graph data
-	get_source_data("total", datetime_threshold)
-	
-	#pie graph data by sentiment
-	for label in labels:
-		get_source_data(label, datetime_threshold)
-		
 	positive_tickets = []
+	positive_sources = []
 	upset_tickets = []
+	upset_sources = []
 	neutral_tickets = []
+	neutral_sources = []
 
 	for ticket in all_tickets:
 		if ticket.sentiment_label == "positive":
 			positive_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+			positive_sources.append(ticket.source)
 		elif ticket.sentiment_label == "upset":
 			upset_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+			upset_sources.append(ticket.source)
 		elif ticket.sentiment_label == "neutral":
 			neutral_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+			neutral_sources.append(ticket.source)
 
 	#counts by label
 	upset_count = {'label':'upset', 'count':len(upset_tickets)}
@@ -191,8 +191,6 @@ def counts():
 	positive_data_points = ["positive"]
 	upset_data_points = ["upset"]
 	neutral_data_points = ["neutral"]
-
-	print "UPSET TICKETS", upset_tickets
 
 	#populate data points
 	for date_and_time in datetime_points:
@@ -211,6 +209,29 @@ def counts():
 	columns.append(upset_data_points)
 	columns.append(neutral_data_points)
 
+	#function to get ticket source breakdowns for pie charts
+	for label in labels:
+		all_source_data = []
+		for source in source_options:
+			if source == "api":
+				single_source_data = ["email"]
+			else:
+				single_source_data = [source]
+			if label == "positive":
+				single_source_data.append(positive_sources.count(source))
+				all_source_data.append(single_source_data)
+			elif label == "upset":
+				single_source_data.append(upset_sources.count(source))
+				all_source_data.append(single_source_data)
+			elif label == "neutral":
+				single_source_data.append(neutral_sources.count(source))
+				all_source_data.append(single_source_data)
+			elif label =="total":
+				single_source_data.append(positive_sources.count(source) + neutral_sources.count(source) + upset_sources.count(source))
+				all_source_data.append(single_source_data)
+
+		source_data[label] = all_source_data
+	
 
 	print "SOURCE DATA", source_data
 	print columns
