@@ -114,6 +114,7 @@ var SentimentGraph = React.createClass({
 
 var SentimentCounter = React.createClass({
   render: function() {
+      var inboxLink = ("/inbox/" + this.props.sentimentCount.label);
       if (this.props.sentimentCount.label == "upset") {
         colorName = "panel panel-danger";
       } else if (this.props.sentimentCount.label == "neutral") {
@@ -125,9 +126,11 @@ var SentimentCounter = React.createClass({
       <div>
         <div className="counters col-md-2 col-md-offset-1">
           <div className={colorName}>
+          <a href= {inboxLink}> 
           <div className="panel-heading">
             <h3 className="panel-title">{this.props.sentimentCount.label}</h3>
           </div>
+          </a>
           <div className="panel-body">
           {this.props.sentimentCount.count}
           </div>

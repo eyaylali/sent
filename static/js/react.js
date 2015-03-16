@@ -27,12 +27,12 @@ var Ticket = React.createClass({
 	  	}
 	    return (
 	    	<tr className={ticketColor} id={ticketId}>
-	  			<td><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
-	    		<td>{this.props.ticket.sentiment}</td>
+	  			<td className="centerElement"><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
+	    		<td className="centerElement">{this.props.ticket.sentiment}</td>
 	    		<td>{this.props.ticket.user_name}</td>
 	    		<td onClick={this.props.handleAccordions}>{this.props.ticket.subject}</td>
-	    		<td>{this.props.ticket.date}</td>
-	    		<td><a target="_blank" href= {zdesk_url}><span className="glyphicon glyphicon-send" aria-hidden="true"></span></a></td>
+	    		<td className="centerElement">{this.props.ticket.date}</td>
+	    		<td className="centerElement"><a target="_blank" href= {zdesk_url}><span className="glyphicon glyphicon-send" aria-hidden="true"></span></a></td>
 	    	</tr>
 	    	);
   }
@@ -103,12 +103,12 @@ var TicketList = React.createClass({
 		        <table className="table table-striped table-hover" >
 		        	<thead>
 		        	<tr className="active">
-		        		<th>Update?</th>
-		        		<th>Sentiment</th>
+		        		<th className="centerElement">Update?</th>
+		        		<th className="centerElement">Sentiment</th>
 		        		<th>Customer Name</th>
 		        		<th>Subject</th>
-		        		<th>Date</th>
-		        		<th>Reply</th>
+		        		<th className="centerElement">Date</th>
+		        		<th className="centerElement">Reply</th>
 		        	</tr>
 		        	</thead>
 		        	<tbody>
@@ -122,6 +122,17 @@ var TicketList = React.createClass({
 
 var InboxPage = React.createClass({
 	getInitialState: function() {
+		 if (this.props.sentiment === "positive") {
+			var highlightedPositive = " active";
+		} else if (this.props.sentiment === "upset") {
+			var highlightedUpset = " active";
+		} else if (this.props.sentiment === "neutral") {
+			var highlightedNeutral = " active";
+		} else if (this.props.sentiment === "all") {
+			var highlightedAll = " active";
+		} else {
+			highlighted = ""
+		};
 		return {
 			sentimentType: this.props.sentiment,
 			data: [],
@@ -130,9 +141,10 @@ var InboxPage = React.createClass({
 			has_next_page: false,
 			total_count: 0,
 			accordions: [],
-			classListPositive: "",
-			classListNeutral: "",
-			classListUpset: ""
+			classListPositive: highlightedPositive,
+			classListNeutral: highlightedNeutral,
+			classListUpset: highlightedUpset,
+			classListAll: highlightedAll
 		};
 		
 	},
