@@ -51,6 +51,11 @@ class Ticket(Base):
 		all_changed_tickets = cls.query.filter(Ticket.update_date > update_date).all()
 		return all_changed_tickets
 
+	@classmethod
+	def list_tickets(cls, query_date):
+		all_tickets = cls.query.filter(Ticket.timestamp > query_date).all()
+		return all_tickets
+
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
 		pass

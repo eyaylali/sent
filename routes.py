@@ -10,7 +10,7 @@ import json
 
 app = Flask(__name__)
  
-#SERVER ROUTES
+#PAGE ROUTES
 
 @app.route("/")
 def index():
@@ -129,24 +129,6 @@ def counts():
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]
 		columns.append(x_axis)
-		for label in labels:
-			count = {'label':label, 'count':model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_day).count()}
-			json_count_results.append(count)
-			data_points = [label]
-
-			#line graph data points
-			for i in range(len(today_by_hour)):
-				if i == (len(today_by_hour) - 1):
-					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > today_by_hour[i]).count()
-					data_points.append(data_point)
-				else:
-					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp.between(today_by_hour[i], today_by_hour[i+1])).count()
-					data_points.append(data_point)	
-			columns.append(data_points)
-
-			#pie graph data
-			get_source_data(label, last_day)
-		get_source_data("total", last_day)
 
 	if time_period == "week":
 		last_week = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
@@ -159,22 +141,6 @@ def counts():
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_week_by_day]
 		columns.append(x_axis)
-		for label in labels:
-			count = {'label': label, 'count': model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_week).count()}
-			json_count_results.append(count)
-			data_points = [label]
-
-			for i in range(7):
-				if i == 6:
-					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_week_by_day[i]).count()
-					data_points.append(data_point)
-				else:
-					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp.between(last_week_by_day[i], last_week_by_day[i+1])).count()
-					data_points.append(data_point)	
-			columns.append(data_points)
-
-			get_source_data(label, last_week)
-		get_source_data("total", last_week)
 
 	if time_period == "month":
 		last_month = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
@@ -185,27 +151,71 @@ def counts():
 			day = day + timedelta(days = 1)
 			last_month_by_day.append(day)
 
-
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_month_by_day]
 		columns.append(x_axis)
+
+
+	#create data points according to timeframe
+	all_tickets = model.Ticket.list_tickets(last_week)
+		
+		#pie graph data
+		get_source_data("total", last_week)
+		
+		#pie graph data by sentiment
 		for label in labels:
-			count = {'label':label, 'count':model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_month).count()}
-			json_count_results.append(count)
-			data_points = [label]
+			get_source_data(label, last_week)
+		
+		positive_tickets = []
+		upset_tickets = []
+		neutral_tickets = []
 
-			for i in range(30):
-				if i == 29:
-					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp > last_month_by_day[i]).count()
-					data_points.append(data_point)
-				else:
-					data_point = model.Ticket.query.filter(model.Ticket.sentiment_label == label, model.Ticket.timestamp.between(last_month_by_day[i], last_month_by_day[i+1])).count()
-					data_points.append(data_point)	
-			columns.append(data_points)
+		for ticket in all_tickets:
+			if ticket.sentiment_label == "positive":
+				positive_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+			elif ticket.sentiment_label == "upset":
+				upset_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+			elif ticket.sentiment_label == "neutral":
+				neutral_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
 
-			get_source_data(label, last_month)
-		get_source_data("total", last_month)
+		#counts by label
+		upset_count = {'label':'upset', 'count':len(upset_tickets)}
+		json_count_results.append(upset_count)
+
+		neutral_count = {'label':'neutral', 'count':len(neutral_tickets)}
+		json_count_results.append(neutral_count)
+
+		pos_count = {'label':'positive', 'count':len(positive_tickets)}
+		json_count_results.append(pos_count)
+
+		#initialize data headers
+		positive_data_points = ["positive"]
+		upset_data_points = ["upset"]
+		neutral_data_points = ["neutral"]
+
+		print "UPSET TICKETS", upset_tickets
+
+		
+		#populate data points
+		for date_and_time in last_week_by_day:
+			count = positive_tickets.count(date_and_time)
+			positive_data_points.append(count)
+
+		for date_and_time in last_week_by_day:
+			count = upset_tickets.count(date_and_time)
+			upset_data_points.append(count)
+
+		for date_and_time in last_week_by_day:
+			count = neutral_tickets.count(date_and_time)
+			neutral_data_points.append(count)
+
+		columns.append(positive_data_points)
+		columns.append(upset_data_points)
+		columns.append(neutral_data_points)
+
+
 
 	print "SOURCE DATA", source_data
+	print columns
 
 	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data)
 
