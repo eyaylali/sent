@@ -32,10 +32,16 @@
 /*pie charts*/
 
 #myPie {
-	max-width: 500px;
-	margin-right: -500px;
+	display: inline-block;
+	max-width: 400px;
 }
 
+.piecharts {
+	margin-left: 30px;
+	text-align: center;
+	margin-bottom: 10%;
+
+}
 
 /*main navbar*/
 
@@ -63,6 +69,11 @@
 
 .ticket-list {
 	margin-top: -9px;
+	margin-bottom: 10%;
+}
+
+#ticket-table td {
+	height: 65px;
 }
 
 #pagination {

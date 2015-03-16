@@ -8,12 +8,13 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, PickleType
 from sqlalchemy.orm import sessionmaker, relationship, backref, scoped_session
 
 ENGINE = create_engine(
-	# "sqlite:///senti.db", 
-	os.environ['POSTGRES_URL'],
+	"sqlite:///senti.db", 
+	# os.environ['POSTGRES_URL'],
 	echo=False
 )
 
 app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['POSTGRES_URL']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['POSTGRES_URL']
 db = SQLAlchemy(app)
 # must manually drop before recreating
@@ -60,6 +61,11 @@ class Ticket(Base):
 	def list_all_tickets(cls):
 		all_tickets = cls.query.all()
 		return all_tickets
+
+	@classmethod
+	def list_all_ticket_ids(cls):
+		all_tickets = cls.query.all()
+		return [ticket.ticket_id for ticket in all_tickets]
 
 	def __repr__(self):
 		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)

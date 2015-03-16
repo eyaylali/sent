@@ -100,7 +100,7 @@ var TicketList = React.createClass({
 					</nav>
 					</div>
 				</div>
-		        <table className="table table-striped table-hover" >
+		        <table id="ticket-table" className="table table-striped table-hover" >
 		        	<thead>
 		        	<tr className="active">
 		        		<th className="centerElement">Update?</th>

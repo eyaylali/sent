@@ -77,6 +77,10 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 				# 	if ticket_id not in added_tickets:
 				# 		if ticket_id <= threshold_id:
 				# 			continue
+				db_tickets = set(Ticket.list_all_ticket_ids())
+				print db_tickets
+				if ticket_id in db_tickets:
+					continue
 				if ticket_id in added_tickets:
 					continue
 
@@ -121,7 +125,11 @@ def main(session):
 	unpack_zendesk_users_tickets(session, USERS, ORGANIZATIONS)
     
 if __name__ == "__main__":
+	main(session)
 
-	while True:
-		main(session)
-		sleep(60)
+
+
+
+	# while True:
+	# 	main(session)
+	# 	sleep(60)

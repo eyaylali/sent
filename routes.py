@@ -167,15 +167,41 @@ def counts():
 	neutral_sources = []
 
 	for ticket in all_tickets:
+		if time_period == "today":
+			date_cleaned = ticket.timestamp.replace(minute = 0, second = 0, microsecond = 0)
+		else:
+			ticket.timestamp.replace(hour=0, minute = 0, second = 0, microsecond = 0)
+
 		if ticket.sentiment_label == "positive":
-			positive_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-			positive_sources.append(ticket.source)
+			positive_tickets.append(date_cleaned)
 		elif ticket.sentiment_label == "upset":
-			upset_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-			upset_sources.append(ticket.source)
+			upset_tickets.append(date_cleaned)
 		elif ticket.sentiment_label == "neutral":
-			neutral_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-			neutral_sources.append(ticket.source)
+			neutral_tickets.append(date_cleaned)
+
+	print positive_tickets
+	print neutral_tickets
+	print upset_tickets
+
+
+	# if t.s == "positive":
+	# 	ticket_list = positive_tickets
+	# elif ts. = "neg":
+	# 	ticket_list = negative_tickets
+
+	# if granularity == "weekly":
+
+
+	# for ticket in all_tickets:
+	# 	if ticket.sentiment_label == "positive":
+	# 		positive_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+	# 		positive_sources.append(ticket.source)
+	# 	elif ticket.sentiment_label == "upset":
+	# 		upset_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+	# 		upset_sources.append(ticket.source)
+	# 	elif ticket.sentiment_label == "neutral":
+	# 		neutral_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+	# 		neutral_sources.append(ticket.source)
 
 	#counts by label
 	upset_count = {'label':'upset', 'count':len(upset_tickets)}
@@ -232,7 +258,6 @@ def counts():
 
 		source_data[label] = all_source_data
 	
-
 	print "SOURCE DATA", source_data
 	print columns
 
