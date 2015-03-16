@@ -118,100 +118,98 @@ def counts():
 		source_data[label] = all_source_data
 
 	if time_period == "today":
-		last_day = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		datetime_threshold = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 		#create a list of all hours in a day to query for
-		today_by_hour = []
-		hour = last_day
+		datetime_points = []
+		hour = datetime_threshold
 		this_hour = today.hour
 		for each_hour in range(this_hour):
 			hour = hour + timedelta(hours = 1)
-			today_by_hour.append(hour)
+			datetime_points.append(hour)
 
-		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in today_by_hour]
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
 
 	if time_period == "week":
-		last_week = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		datetime_threshold = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 		#create a list of all days of a week to query for
-		last_week_by_day = []
-		day = last_week
+		datetime_points = []
+		day = datetime_threshold
 		for each_day in range(7):
 			day = day + timedelta(days = 1)
-			last_week_by_day.append(day)
+			datetime_points.append(day)
 
-		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_week_by_day]
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
 
 	if time_period == "month":
-		last_month = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		datetime_threshold = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 		#create a list of all days of a month to query for
-		last_month_by_day = []
-		day = last_month
+		datetime_points = []
+		day = datetime_threshold
 		for each_day in range(30):
 			day = day + timedelta(days = 1)
-			last_month_by_day.append(day)
+			datetime_points.append(day)
 
-		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in last_month_by_day]
+		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
 
 
 	#create data points according to timeframe
-	all_tickets = model.Ticket.list_tickets(last_week)
+	all_tickets = model.Ticket.list_tickets(datetime_threshold)
 		
-		#pie graph data
-		get_source_data("total", last_week)
+	#pie graph data
+	get_source_data("total", datetime_threshold)
+	
+	#pie graph data by sentiment
+	for label in labels:
+		get_source_data(label, datetime_threshold)
 		
-		#pie graph data by sentiment
-		for label in labels:
-			get_source_data(label, last_week)
-		
-		positive_tickets = []
-		upset_tickets = []
-		neutral_tickets = []
+	positive_tickets = []
+	upset_tickets = []
+	neutral_tickets = []
 
-		for ticket in all_tickets:
-			if ticket.sentiment_label == "positive":
-				positive_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-			elif ticket.sentiment_label == "upset":
-				upset_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-			elif ticket.sentiment_label == "neutral":
-				neutral_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+	for ticket in all_tickets:
+		if ticket.sentiment_label == "positive":
+			positive_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+		elif ticket.sentiment_label == "upset":
+			upset_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
+		elif ticket.sentiment_label == "neutral":
+			neutral_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
 
-		#counts by label
-		upset_count = {'label':'upset', 'count':len(upset_tickets)}
-		json_count_results.append(upset_count)
+	#counts by label
+	upset_count = {'label':'upset', 'count':len(upset_tickets)}
+	json_count_results.append(upset_count)
 
-		neutral_count = {'label':'neutral', 'count':len(neutral_tickets)}
-		json_count_results.append(neutral_count)
+	neutral_count = {'label':'neutral', 'count':len(neutral_tickets)}
+	json_count_results.append(neutral_count)
 
-		pos_count = {'label':'positive', 'count':len(positive_tickets)}
-		json_count_results.append(pos_count)
+	pos_count = {'label':'positive', 'count':len(positive_tickets)}
+	json_count_results.append(pos_count)
 
-		#initialize data headers
-		positive_data_points = ["positive"]
-		upset_data_points = ["upset"]
-		neutral_data_points = ["neutral"]
+	#initialize data headers
+	positive_data_points = ["positive"]
+	upset_data_points = ["upset"]
+	neutral_data_points = ["neutral"]
 
-		print "UPSET TICKETS", upset_tickets
+	print "UPSET TICKETS", upset_tickets
 
-		
-		#populate data points
-		for date_and_time in last_week_by_day:
-			count = positive_tickets.count(date_and_time)
-			positive_data_points.append(count)
+	#populate data points
+	for date_and_time in datetime_points:
+		count = positive_tickets.count(date_and_time)
+		positive_data_points.append(count)
 
-		for date_and_time in last_week_by_day:
-			count = upset_tickets.count(date_and_time)
-			upset_data_points.append(count)
+	for date_and_time in datetime_points:
+		count = upset_tickets.count(date_and_time)
+		upset_data_points.append(count)
 
-		for date_and_time in last_week_by_day:
-			count = neutral_tickets.count(date_and_time)
-			neutral_data_points.append(count)
+	for date_and_time in datetime_points:
+		count = neutral_tickets.count(date_and_time)
+		neutral_data_points.append(count)
 
-		columns.append(positive_data_points)
-		columns.append(upset_data_points)
-		columns.append(neutral_data_points)
-
+	columns.append(positive_data_points)
+	columns.append(upset_data_points)
+	columns.append(neutral_data_points)
 
 
 	print "SOURCE DATA", source_data
