@@ -9,7 +9,7 @@ var PieGraph = React.createClass({
         type : 'donut',
     },
     color: {
-        pattern: ['#9c27b0', '#e51c23', '#ff9800']
+        pattern: ['#2196f3', '#92CBF8', '#C9C9C9']
     },
     donut: {
         title: "Source"
@@ -54,7 +54,7 @@ var SentimentGraph = React.createClass({
         onclick: function (d) { this.handleSeriesClick(d.id) }.bind(this),
     },
     color: {
-        pattern: ['#9c27b0', '#e51c23', '#ff9800']
+        pattern: ['#e51c23', '#ff9800', '#9c27b0']
     },
     axis: {
         x: {

@@ -118,12 +118,12 @@ var TicketList = React.createClass({
 		        <table id="ticket-table" className="table table-striped table-hover" >
 		        	<thead>
 		        	<tr className="active">
-		        		<th className="centerElement">Update?</th>
-		        		<th className="centerElement">Sentiment</th>
-		        		<th>Customer Name</th>
-		        		<th>Subject</th>
-		        		<th className="centerElement">Date</th>
-		        		<th className="centerElement">Reply</th>
+		        		<th className="centerElement" id="ticket-update">Update?</th>
+		        		<th className="centerElement" id="ticket-sentiment">Sentiment</th>
+		        		<th id="ticket-name">Customer Name</th>
+		        		<th id="ticket-subject">Subject</th>
+		        		<th className="centerElement" id="ticket-date">Date</th>
+		        		<th className="centerElement" id="ticket-reply">Reply</th>
 		        	</tr>
 		        	</thead>
 		        	<tbody>

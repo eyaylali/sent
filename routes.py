@@ -221,9 +221,9 @@ def counts():
 		count = neutral_tickets.count(date_and_time)
 		neutral_data_points.append(count)
 
-	columns.append(positive_data_points)
 	columns.append(upset_data_points)
 	columns.append(neutral_data_points)
+	columns.append(positive_data_points)
 
 	#function to get ticket source breakdowns for pie charts
 	for label in labels:

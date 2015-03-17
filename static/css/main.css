@@ -79,7 +79,7 @@
 }
 
 #ticket-table td {
-/*	height: 40px;*/
+	max-height: 41px;
 	padding-top: -5px;
 }
 
@@ -112,22 +112,58 @@
 	margin-bottom: -10px;
 }
 
+#ticket-update {
+	width:64px !important;
+	height: 40px;
+}
+
+#ticket-sentiment {
+	width: 77px !important;
+	height: 40px;
+}
+
+#ticket-name {
+	width: 144px !important;
+	height: 40px;
+}
+
+#ticket-subject {
+	width: 445px !important;
+	height: 40px;
+}
+
+#ticket-date {
+	width: 64px !important;
+	height: 40px;
+}
+
+#ticket-reply {
+	width: 50px !important;
+	height: 40px;
+}
+
+
+/*other*/
+
 a:link {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 a:visited {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 a:hover {
-    text-decoration: none;
+    text-decoration: none !important;
+
 }
 
 a:active {
-    text-decoration: none;
+    text-decoration: none !important;
 }
 
 .centerElement {
 	text-align: center;
 }
+
+
