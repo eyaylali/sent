@@ -34,7 +34,6 @@
 
 }
 
-
 /*pie charts*/
 
 #myPie {
@@ -43,7 +42,7 @@
 }
 
 .piecharts {
-	margin-left: 30px;
+	margin-top: 10px;
 	text-align: center;
 	margin-bottom: 10%;
 

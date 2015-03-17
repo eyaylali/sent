@@ -1,6 +1,6 @@
 from zdesk import Zendesk
 from tokenizer import tokenize_text
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer
 import model
 from model import Ticket, User, session
 from datetime import datetime, date
@@ -18,12 +18,14 @@ USERS = zendesk.users_list()
 ORGANIZATIONS = zendesk.organizations_list()
 print ORGANIZATIONS
 
-# load the saved pipeline that includes vectorizer & classifier
+# load the saved vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')
+vectorizer = joblib.load('train/vectorizer.pickle')
 # last_update = pickle.load(open('last_update_time.p', 'rb'))
 today = datetime.now()
 
 sentiment_changed_tickets = Ticket.list_changed_tickets(today)
+
 def learn_new_data():
 	X_data = []
 	y_labels = []
@@ -34,7 +36,7 @@ def learn_new_data():
 		all_content = ticket_title + ticket_content
 		X_data.append(all_content)
 		y_labels.append(ticket_label)
-	X_data = np.array(X_data)
+	X_data = vectorizer.transform(X_data)
 	y_labels = np.array(y_labels)
 	classes = np.array(["positive", "upset", "neutral"])
 	classifier.partial_fit(X_data, y_labels, classes)
@@ -71,18 +73,11 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 			if ticket["status"] == "open" or ticket["status"] == "pending":
 				ticket_id = int(ticket["id"])
 
-				#if the ticket_id of the ticket to be added is less than or equal to the threshold, don't add it
-				# if threshold_id:
-				# 	if ticket_id not in added_tickets:
-				# 		if ticket_id <= threshold_id:
-				# 			continue
 				db_tickets = set(Ticket.list_all_ticket_ids())
-				print db_tickets
 				if ticket_id in db_tickets:
 					continue
 				if ticket_id in added_tickets:
 					continue
-
 
 				subject = ticket["subject"]
 				content = ticket["description"]
@@ -122,7 +117,7 @@ def predict_sentiment_label(all_content):
 	return label[0]
 
 def main(session):
-	# learn_new_data()
+	learn_new_data()
 	unpack_zendesk_users_tickets(session, USERS, ORGANIZATIONS)
     
 if __name__ == "__main__":

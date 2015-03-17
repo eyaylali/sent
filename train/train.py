@@ -51,26 +51,32 @@ def unpack_review(review):
         label = "positive"
     return all_content, label
 
-def create_model():
-    tfidf = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False, analyzer = "word")
-    clf = BernoulliNB()
-    pipleline = Pipeline([('vect', tfidf), ('clf', clf)])
-    return pipleline
+# def create_model():
+#     tfidf = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False, analyzer = "word")
+#     clf = BernoulliNB()
+#     pipleline = Pipeline([('vect', tfidf), ('clf', clf)])
+#     return pipleline
 
-def train_model(clf, review_data, labels):
+def train_model(review_data, labels):
+    vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False, analyzer = "word")
+
+    clf = BernoulliNB()
+
+    X = vectorizer.fit_transform(review_data)
+    y = np.array(labels)
+    joblib.dump(X, "vectorizer.pickle")
+
     cross_validation = StratifiedKFold(labels, n_folds=10, indices=None, shuffle=True, random_state=0)
-    review_s = pd.Series(data=review_data)
-    labels_s = pd.Series(data=labels)
 
     for train, test in cross_validation:
-        X_train, y_train = review_s[train], labels_s[train]
-        X_test, y_test = review_s[test], labels_s[test]
+        X_train, y_train = X[train], y[train]
+        X_test, y_test = X[test], y[test]
 
-        clf.fit(X_train, y_train)
+        trained_classifier = clf.fit(X_train, y_train)
 
         predicted = predict(clf, X_test)
         evaluate_model(y_test, predicted)
-    joblib.dump(clf, "classifier.pickle")
+    joblib.dump(trained_classifier, "classifier.pickle")
 
 def predict(clf, test_data):
     results = []
@@ -102,8 +108,8 @@ def evaluate_model(label_true,label_predicted):
 
 def main():
     review_data, labels = parse_files('test-data/*.json')
-    clf = create_model()
-    train_model(clf, review_data, labels)
+    # clf = create_model()
+    train_model(review_data, labels)
 
 if __name__ == "__main__":
     main()

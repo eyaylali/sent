@@ -41,9 +41,5 @@ def tokenize_text(input_string):
 #     script, input_file = argv
 #     main(input_file)
 
-####TODO####
-#remove ' from negation
-#think about tweets
-#add negation
 
 		
