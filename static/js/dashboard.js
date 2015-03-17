@@ -8,6 +8,9 @@ var PieGraph = React.createClass({
         columns: [],
         type : 'donut',
     },
+    color: {
+        pattern: ['#9c27b0', '#e51c23', '#ff9800']
+    },
     donut: {
         title: "Source"
     }
@@ -49,6 +52,9 @@ var SentimentGraph = React.createClass({
         xFormat: "%Y-%m-%d %H:%M:%S",
         columns: this.props.columns,
         onclick: function (d) { this.handleSeriesClick(d.id) }.bind(this),
+    },
+    color: {
+        pattern: ['#9c27b0', '#e51c23', '#ff9800']
     },
     axis: {
         x: {
@@ -99,10 +105,10 @@ var SentimentGraph = React.createClass({
   },
   render: function() {
     return (
-      <div>
-      <div className="line-graph col-md-offset-1">
-      <div ref="myLineGraph"></div>
-      </div>
+      <div className="graphs">
+        <div className="line-graph col-md-offset-1">
+          <div ref="myLineGraph"></div>
+        </div>
         <div className="row piecharts">
           <PieGraph chartData={this.props.sourceData} sentimentType = "total"/>
           <PieGraph chartData={this.props.sourceData} sentimentType = {this.state.sentimentType}/>
@@ -176,12 +182,11 @@ var SentimentCounterList = React.createClass({
     };
     return (
       <div>
-      <div className="counterList row">
-      <div className="col-md-1">
-      </div>
-      {counts}
-      </div>
-      <SentimentGraph {...this.state}/>
+        <div className="counterList row">
+          <div className="col-md-1"></div>
+          {counts}
+        </div>
+        <SentimentGraph {...this.state}/>
       </div>
     );
   }

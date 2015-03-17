@@ -40,7 +40,6 @@ def learn_new_data():
 	classifier.partial_fit(X_data, y_labels, classes)
 	pickle.dump(today, open('last_update_time.p', 'wb'))
 
-
 def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 	existing_users = User.list_user_ids()
 	for user in user_dict["users"]:
@@ -96,6 +95,7 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 					priority = 1
 				else:
 					priority = 2
+
 				timestamp = datetime.strptime(ticket["created_at"], "%Y-%m-%dT%H:%M:%SZ")
 				status = ticket["status"]
 				label = predict_sentiment_label(all_content)
@@ -122,6 +122,7 @@ def predict_sentiment_label(all_content):
 	return label[0]
 
 def main(session):
+	# learn_new_data()
 	unpack_zendesk_users_tickets(session, USERS, ORGANIZATIONS)
     
 if __name__ == "__main__":

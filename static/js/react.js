@@ -17,21 +17,30 @@ var TicketAccordion = React.createClass({
 var Ticket = React.createClass({
   	render: function() {
 	  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
-	  	var date = moment(this.props.date)
 	  	var ticketId = "ticket_row_" + this.props.ticket.ticket_id;
 	  	var ticketAccordionId = "accordion_row_" + this.props.ticket.ticket_id;
+	  	if (this.props.ticket.today) {
+	  		var date = moment(this.props.ticket.date).format("h:mm a")
+	  	} else {
+	  		var date = moment(this.props.ticket.date).format("M/DD")
+	  	};
 	  	if (this.props.ticket.sentiment === "upset") {
 	  		ticketColor = "danger";
 	  	} else {
 	  		ticketColor = "active";
-	  	}
+	  	};
+	  	if (this.props.ticket.source == "twitter" || this.props.ticket.source == "facebook") {
+	  		var toExistOrNot = "label label-primary";
+	  	} else {
+	  		var toExistOrNot = "";
+	  	};
 	    return (
 	    	<tr className={ticketColor} id={ticketId}>
 	  			<td className="centerElement"><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
 	    		<td className="centerElement">{this.props.ticket.sentiment}</td>
 	    		<td>{this.props.ticket.user_name}</td>
-	    		<td onClick={this.props.handleAccordions}>{this.props.ticket.subject}</td>
-	    		<td className="centerElement">{this.props.ticket.date}</td>
+	    		<td onClick={this.props.handleAccordions}>{this.props.ticket.subject}<p><span className={toExistOrNot}>public</span></p></td>
+	    		<td className="centerElement">{date}</td>
 	    		<td className="centerElement"><a target="_blank" href= {zdesk_url}><span className="glyphicon glyphicon-send" aria-hidden="true"></span></a></td>
 	    	</tr>
 	    	);

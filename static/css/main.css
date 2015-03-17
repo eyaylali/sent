@@ -29,6 +29,12 @@
 	margin-bottom: 30px;
 }
 
+.graphs {
+	margin-left: -1%;
+
+}
+
+
 /*pie charts*/
 
 #myPie {

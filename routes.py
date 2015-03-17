@@ -6,6 +6,7 @@ import model
 from model import session
 from datetime import datetime, date, timedelta
 import json
+import pytz
 
 
 app = Flask(__name__)
@@ -32,7 +33,7 @@ def update_ticket_sentiment():
 	for ticket_num in changing_tickets:
 		session.query(model.Ticket).filter(model.Ticket.ticket_id == ticket_num).update({
 			"sentiment_label" : target_sentiment,
-			"update_date" : datetime.now()
+			"update_date" : datetime.utcnow()
 		})
 		session.commit()
 
@@ -62,6 +63,15 @@ def tickets(label):
 	  	json_results = []
 	 	cursor = page
 		for result in ticket_results[0:20]:
+			# localtz = pytz.timezone('America/Los_Angeles')
+			# tz_aware_timestamp = localtz.localize(result.timestamp)
+			ticket_day = result.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+			today_day = datetime.utcnow().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+
+			if ticket_day == today_day:
+				today = True
+			else:
+				today = False
 			d = {
 	    		'ticket_id': result.ticket_id,
 				'user_id': result.user_id,
@@ -72,7 +82,8 @@ def tickets(label):
 				'content': result.content,
 				'status': result.status,
 				'source': result.source,
-				'sentiment': result.sentiment_label
+				'sentiment': result.sentiment_label,
+				'today': today
 			}
 			json_results.append(d)
 
@@ -110,7 +121,7 @@ def tickets(label):
 def counts():
 
 	time_period = request.args.get('time')
-	today = datetime.now()
+	today = datetime.utcnow()
 	
 	# Query and collect data for each sentiment for the given time range
 	json_count_results = []
@@ -170,38 +181,17 @@ def counts():
 		if time_period == "today":
 			date_cleaned = ticket.timestamp.replace(minute = 0, second = 0, microsecond = 0)
 		else:
-			ticket.timestamp.replace(hour=0, minute = 0, second = 0, microsecond = 0)
+			date_cleaned = ticket.timestamp.replace(hour=0, minute = 0, second = 0, microsecond = 0)
 
 		if ticket.sentiment_label == "positive":
 			positive_tickets.append(date_cleaned)
+			positive_sources.append(ticket.source)
 		elif ticket.sentiment_label == "upset":
 			upset_tickets.append(date_cleaned)
+			upset_sources.append(ticket.source)
 		elif ticket.sentiment_label == "neutral":
 			neutral_tickets.append(date_cleaned)
-
-	print positive_tickets
-	print neutral_tickets
-	print upset_tickets
-
-
-	# if t.s == "positive":
-	# 	ticket_list = positive_tickets
-	# elif ts. = "neg":
-	# 	ticket_list = negative_tickets
-
-	# if granularity == "weekly":
-
-
-	# for ticket in all_tickets:
-	# 	if ticket.sentiment_label == "positive":
-	# 		positive_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-	# 		positive_sources.append(ticket.source)
-	# 	elif ticket.sentiment_label == "upset":
-	# 		upset_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-	# 		upset_sources.append(ticket.source)
-	# 	elif ticket.sentiment_label == "neutral":
-	# 		neutral_tickets.append(ticket.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0))
-	# 		neutral_sources.append(ticket.source)
+			neutral_sources.append(ticket.source)
 
 	#counts by label
 	upset_count = {'label':'upset', 'count':len(upset_tickets)}
@@ -258,7 +248,6 @@ def counts():
 
 		source_data[label] = all_source_data
 	
-	print "SOURCE DATA", source_data
 	print columns
 
 	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data)
