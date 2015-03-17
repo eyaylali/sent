@@ -79,7 +79,8 @@
 }
 
 #ticket-table td {
-	height: 65px;
+/*	height: 40px;*/
+	padding-top: -5px;
 }
 
 #pagination {
@@ -105,6 +106,10 @@
 
 .message-body {
 	margin: 10px 10px;
+}
+
+#ticket-tag {
+	margin-bottom: -10px;
 }
 
 a:link {

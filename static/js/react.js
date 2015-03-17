@@ -19,6 +19,12 @@ var Ticket = React.createClass({
 	  	var zdesk_url = ("https://sent.zendesk.com/agent/tickets/" + this.props.ticket.ticket_id);
 	  	var ticketId = "ticket_row_" + this.props.ticket.ticket_id;
 	  	var ticketAccordionId = "accordion_row_" + this.props.ticket.ticket_id;
+	  	var subjectLength = this.props.ticket.subject.length;
+	  	if (subjectLength <= 60) {
+	  		var subject = this.props.ticket.subject;
+	  	} else {
+	  		var subject = this.props.ticket.subject.slice(0,60) + "... ";
+	  	};
 	  	if (this.props.ticket.today) {
 	  		var date = moment(this.props.ticket.date).format("h:mm a")
 	  	} else {
@@ -39,7 +45,7 @@ var Ticket = React.createClass({
 	  			<td className="centerElement"><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
 	    		<td className="centerElement">{this.props.ticket.sentiment}</td>
 	    		<td>{this.props.ticket.user_name}</td>
-	    		<td onClick={this.props.handleAccordions}>{this.props.ticket.subject}<p><span className={toExistOrNot}>public</span></p></td>
+	    		<td onClick={this.props.handleAccordions}>{subject} <span className={toExistOrNot}>public</span></td>
 	    		<td className="centerElement">{date}</td>
 	    		<td className="centerElement"><a target="_blank" href= {zdesk_url}><span className="glyphicon glyphicon-send" aria-hidden="true"></span></a></td>
 	    	</tr>
