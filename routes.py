@@ -22,7 +22,7 @@ def index():
 def show_inbox(label):
 	return render_template("inbox.html", label = label)
 
-# API ENDPOINTS
+# SERVER API ENDPOINTS
 
 @app.route('/sent/api/tickets/', methods=['POST'])
 def update_ticket_sentiment():
@@ -33,7 +33,7 @@ def update_ticket_sentiment():
 	for ticket_num in changing_tickets:
 		session.query(model.Ticket).filter(model.Ticket.ticket_id == ticket_num).update({
 			"sentiment_label" : target_sentiment,
-			"update_date" : datetime.now()
+			"update_date" : datetime.utcnow()
 		})
 		session.commit()
 
