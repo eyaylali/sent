@@ -37,15 +37,17 @@ var Ticket = React.createClass({
 	  	};
 	  	if (this.props.ticket.source == "twitter" || this.props.ticket.source == "facebook") {
 	  		var toExistOrNot = "label label-primary";
+	  		var label = "public"
 	  	} else {
 	  		var toExistOrNot = "";
+	  		var label = "";
 	  	};
 	    return (
 	    	<tr className={ticketColor} id={ticketId}>
 	  			<td className="centerElement"><input type="checkbox" checked={this.props.selected} onChange={this.props.handleTicketSelection} /></td>
 	    		<td className="centerElement">{this.props.ticket.sentiment}</td>
 	    		<td>{this.props.ticket.user_name}</td>
-	    		<td onClick={this.props.handleAccordions}>{subject} <span className={toExistOrNot}>public</span></td>
+	    		<td onClick={this.props.handleAccordions}>{subject} <span className={toExistOrNot}>{label}</span></td>
 	    		<td className="centerElement">{date}</td>
 	    		<td className="centerElement"><a target="_blank" href= {zdesk_url}><span className="glyphicon glyphicon-send" aria-hidden="true"></span></a></td>
 	    	</tr>

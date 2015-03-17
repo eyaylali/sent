@@ -36,16 +36,21 @@
 
 /*pie charts*/
 
-#myPie {
+/*#myPie {
 	display: inline-block;
 	max-width: 400px;
 }
-
+*/
 .piecharts {
 	margin-top: 10px;
 	text-align: center;
 	margin-bottom: 10%;
 
+}
+
+#pieChartAndTitle {
+	width:400px;
+	display: inline-block;
 }
 
 /*main navbar*/
@@ -127,12 +132,12 @@
 }
 
 #ticket-subject {
-	width: 445px !important;
+	width: 435px !important;
 	height: 40px;
 }
 
 #ticket-date {
-	width: 64px !important;
+	width: 74px !important;
 	height: 40px;
 }
 

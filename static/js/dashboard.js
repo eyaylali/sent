@@ -2,7 +2,6 @@
 
 var PieGraph = React.createClass({
   componentDidMount: function() {
-    var status_title = "Source (" + this.props.sentimentType + ")";
     this.chart = c3.generate({
       bindto: this.refs.myPie.getDOMNode(),
     data: {
@@ -13,16 +12,13 @@ var PieGraph = React.createClass({
         pattern: ['#2196f3', '#92CBF8', '#C9C9C9']
     },
     donut: {
-        title: status_title
+        title: ""
     }
   });
   },
   updatePie: function () {
-    var status_title = "Source (" + this.props.sentimentType + ")";
-    console.log(status_title);
     this.chart.load({
-      columns: this.props.chartData[this.props.sentimentType],
-      title: status_title
+      columns: this.props.chartData[this.props.sentimentType]
     });
   },
   componentDidUpdate: function (prevProps) {
@@ -33,9 +29,14 @@ var PieGraph = React.createClass({
   },
   render: function() {
     return (
-      <div id="myPie" ref="myPie"></div>
-     );
-  }
+      <div id="pieChartAndTitle">
+        <div className="chart-title">
+        <span>Source ({this.props.sentimentType})</span>
+        </div>
+        <div id="myPie" ref="myPie"/>
+      </div>
+    );
+  } 
 });
 
 var SentimentGraph = React.createClass({
