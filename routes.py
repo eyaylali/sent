@@ -139,7 +139,6 @@ def counts():
 
 	if time_period == "today":
 		datetime_threshold = (today_for_query - timedelta(hours = 24)).replace(minute = 0, second = 0, microsecond = 0)
-		print datetime_threshold
 		#create a list of all hours in 24 to query for
 		datetime_points = []
 		hour = datetime_threshold - timedelta(hours=7)
@@ -154,36 +153,30 @@ def counts():
 		columns.append(x_axis)
 
 	if time_period == "week":
-		datetime_threshold = (today_for_query - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		datetime_threshold = (today_for_query - timedelta(days = 7)).replace(hour=0, minute = 0, second = 0, microsecond = 0)
 		#create a list of all days of a week to query for and display
 		datetime_points = []
 
-		day = datetime_threshold
+		day = (today - timedelta(days = 7)).replace(hour=0, minute = 0, second = 0, microsecond = 0)
 		for each_day in range(7):
 			day = day + timedelta(days = 1)
 			datetime_points.append(day)
 
-		print datetime_threshold
-		print day
-		print datetime_points
-
-		query_datetime_points = [(time + timedelta(hours=7)) for time in datetime_points]
-
-		print query_datetime_points
+		query_datetime_points = [time for time in datetime_points]
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
 
 	if time_period == "month":
-		datetime_threshold = (today_for_query - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		datetime_threshold = (today_for_query - timedelta(days = 30)).replace(hour=0, minute = 0, second = 0, microsecond = 0)
 		#create a list of all days of a month to query for
 		datetime_points = []
-		day = datetime_threshold
+		day = (today - timedelta(days = 30)).replace(hour=0, minute = 0, second = 0, microsecond = 0)
 		for each_day in range(30):
 			day = day + timedelta(days = 1)
 			datetime_points.append(day)
 
-		query_datetime_points = [(time + timedelta(hours=7)) for time in datetime_points]
+		query_datetime_points = [time for time in datetime_points]
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
@@ -203,6 +196,7 @@ def counts():
 			date_cleaned = ticket.timestamp.replace(minute = 0, second = 0, microsecond = 0)
 		else:
 			date_cleaned = ticket.timestamp.replace(hour=0, minute = 0, second = 0, microsecond = 0)
+
 
 		if ticket.sentiment_label == "positive":
 			positive_tickets.append(date_cleaned)
@@ -230,6 +224,7 @@ def counts():
 	neutral_data_points = ["neutral"]
 
 	#populate data points
+	print "POSITIVE TICKETS", positive_tickets
 	for date_and_time in query_datetime_points:
 		count = positive_tickets.count(date_and_time)
 		positive_data_points.append(count)
