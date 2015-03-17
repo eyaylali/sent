@@ -40,7 +40,7 @@ var Ticket = React.createClass({
 	  		var label = "public"
 	  	} else {
 	  		var toExistOrNot = "";
-	  		var label = "";
+	  		var label = ""
 	  	};
 	    return (
 	    	<tr className={ticketColor} id={ticketId}>

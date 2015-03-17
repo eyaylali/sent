@@ -21,7 +21,7 @@ print ORGANIZATIONS
 # load the saved vectorizer & classifier
 classifier = joblib.load('train/classifier.pickle')
 vectorizer = joblib.load('train/vectorizer.pickle')
-# last_update = pickle.load(open('last_update_time.p', 'rb'))
+last_update = pickle.load(open('last_update_time.p', 'rb'))
 today = datetime.now()
 
 sentiment_changed_tickets = Ticket.list_changed_tickets(today)
@@ -113,7 +113,8 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 				added_tickets.append(ticket_id)
 
 def predict_sentiment_label(all_content):
-	label = train.predict(classifier, [all_content])
+	X = vectorizer.transform(all_content)
+	label = train.predict(classifier, X)
 	return label[0]
 
 def main(session):

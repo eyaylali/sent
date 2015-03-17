@@ -64,7 +64,7 @@ def train_model(review_data, labels):
 
     X = vectorizer.fit_transform(review_data)
     y = np.array(labels)
-    joblib.dump(X, "vectorizer.pickle")
+    joblib.dump(vectorizer, "vectorizer.pickle")
 
     cross_validation = StratifiedKFold(labels, n_folds=10, indices=None, shuffle=True, random_state=0)
 
@@ -72,11 +72,12 @@ def train_model(review_data, labels):
         X_train, y_train = X[train], y[train]
         X_test, y_test = X[test], y[test]
 
-        trained_classifier = clf.fit(X_train, y_train)
-
+        clf.fit(X_train, y_train)
         predicted = predict(clf, X_test)
         evaluate_model(y_test, predicted)
-    joblib.dump(trained_classifier, "classifier.pickle")
+
+    clf.fit(X, y)
+    joblib.dump(clf, "classifier.pickle")
 
 def predict(clf, test_data):
     results = []

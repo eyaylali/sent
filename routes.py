@@ -33,7 +33,7 @@ def update_ticket_sentiment():
 	for ticket_num in changing_tickets:
 		session.query(model.Ticket).filter(model.Ticket.ticket_id == ticket_num).update({
 			"sentiment_label" : target_sentiment,
-			"update_date" : datetime.utcnow()
+			"update_date" : datetime.now()
 		})
 		session.commit()
 
@@ -66,7 +66,7 @@ def tickets(label):
 			# localtz = pytz.timezone('America/Los_Angeles')
 			# tz_aware_timestamp = localtz.localize(result.timestamp)
 			ticket_day = result.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-			today_day = datetime.utcnow().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+			today_day = datetime.now().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 
 			if ticket_day == today_day:
 				today = True
@@ -121,7 +121,7 @@ def tickets(label):
 def counts():
 
 	time_period = request.args.get('time')
-	today = datetime.utcnow()
+	today = datetime.now()
 	
 	# Query and collect data for each sentiment for the given time range
 	json_count_results = []
