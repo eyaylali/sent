@@ -124,9 +124,7 @@ def main(session):
 if __name__ == "__main__":
 	main(session)
 
-
-
-
 	# while True:
 	# 	main(session)
 	# 	sleep(60)
+

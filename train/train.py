@@ -51,12 +51,6 @@ def unpack_review(review):
         label = "positive"
     return all_content, label
 
-# def create_model():
-#     tfidf = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False, analyzer = "word")
-#     clf = BernoulliNB()
-#     pipleline = Pipeline([('vect', tfidf), ('clf', clf)])
-#     return pipleline
-
 def train_model(review_data, labels):
     vectorizer = TfidfVectorizer(tokenizer = tokenize_text, lowercase = False, analyzer = "word")
 

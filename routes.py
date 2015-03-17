@@ -65,13 +65,19 @@ def tickets(label):
 		for result in ticket_results[0:20]:
 			# localtz = pytz.timezone('America/Los_Angeles')
 			# tz_aware_timestamp = localtz.localize(result.timestamp)
-			ticket_day = result.timestamp.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+			print result.timestamp
+			ticket_day = (result.timestamp - timedelta(hours = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 			today_day = datetime.now().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+
+			print "TICKET DAY", ticket_day
+			print "TODAY DAY", today_day
 
 			if ticket_day == today_day:
 				today = True
+				print today
 			else:
 				today = False
+				print today
 			d = {
 	    		'ticket_id': result.ticket_id,
 				'user_id': result.user_id,
@@ -122,6 +128,7 @@ def counts():
 
 	time_period = request.args.get('time')
 	today = datetime.now()
+	today_for_query = datetime.utcnow()
 	
 	# Query and collect data for each sentiment for the given time range
 	json_count_results = []
@@ -131,38 +138,52 @@ def counts():
 	source_options = ["api", "twitter", "facebook"]
 
 	if time_period == "today":
-		datetime_threshold = today.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-		#create a list of all hours in a day to query for
+		datetime_threshold = (today_for_query - timedelta(hours = 24)).replace(minute = 0, second = 0, microsecond = 0)
+		print datetime_threshold
+		#create a list of all hours in 24 to query for
 		datetime_points = []
-		hour = datetime_threshold
+		hour = datetime_threshold - timedelta(hours=7)
 		this_hour = today.hour
-		for each_hour in range(this_hour):
+		for each_hour in range(24):
 			hour = hour + timedelta(hours = 1)
 			datetime_points.append(hour)
+
+		query_datetime_points = [(time + timedelta(hours=7)) for time in datetime_points]
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
 
 	if time_period == "week":
-		datetime_threshold = (today - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-		#create a list of all days of a week to query for
+		datetime_threshold = (today_for_query - timedelta(days = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		#create a list of all days of a week to query for and display
 		datetime_points = []
+
 		day = datetime_threshold
 		for each_day in range(7):
 			day = day + timedelta(days = 1)
 			datetime_points.append(day)
 
+		print datetime_threshold
+		print day
+		print datetime_points
+
+		query_datetime_points = [(time + timedelta(hours=7)) for time in datetime_points]
+
+		print query_datetime_points
+
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
 
 	if time_period == "month":
-		datetime_threshold = (today - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+		datetime_threshold = (today_for_query - timedelta(days = 30)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 		#create a list of all days of a month to query for
 		datetime_points = []
 		day = datetime_threshold
 		for each_day in range(30):
 			day = day + timedelta(days = 1)
 			datetime_points.append(day)
+
+		query_datetime_points = [(time + timedelta(hours=7)) for time in datetime_points]
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
@@ -209,15 +230,15 @@ def counts():
 	neutral_data_points = ["neutral"]
 
 	#populate data points
-	for date_and_time in datetime_points:
+	for date_and_time in query_datetime_points:
 		count = positive_tickets.count(date_and_time)
 		positive_data_points.append(count)
 
-	for date_and_time in datetime_points:
+	for date_and_time in query_datetime_points:
 		count = upset_tickets.count(date_and_time)
 		upset_data_points.append(count)
 
-	for date_and_time in datetime_points:
+	for date_and_time in query_datetime_points:
 		count = neutral_tickets.count(date_and_time)
 		neutral_data_points.append(count)
 
