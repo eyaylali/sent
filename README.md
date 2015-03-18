@@ -3,11 +3,11 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Technologies](#technologies)
-- [Search](#search)
-- [My Recipes](#my-recipes)
-- [Planner](#planner)
-- [Ingredient Parser](#ingredient-parser)
-- [Shopping List](#shopping-list)
+- [Dashboard](#dashboard)
+- [Inbox](#inbox)
+- [Sentiment Analysis](#sentiment-analysis)
+- [Machine Learning](#machine-learning)
+- [ReactJS](#reactjs)
 - [Installation](#installation)
 
 ## Introduction
@@ -16,20 +16,28 @@ Senti is a tool that helps customer support teams prioritize their ticket queues
 
 ## Technologies
 
-*Backend*
+**Backend**
 
 Python, Flask, SQLAlchemy, PostgreSQL, scikit-learn, NLTK, Zendesk API, NumPy, AJAX
 
-*Frontend*
+**Frontend**
 
 ReactJS, C3.js, Javascript, HTML, CSS, Bootswatch
+
+## Dashboard
 
 ![dashboard]
 (/gifs/graphs.gif)
 
+*Counters and Line Graph*
+
 ![dashboard]
 (/gifs/piecharts.gif)
 
-![dashboard]
+*Source pie graphs responding to clicks*
+
+![inbox]
 (/gifs/inbox.gif)
+
+*Viewing message in inbox, updating sentiment in system, and relpying*
 
