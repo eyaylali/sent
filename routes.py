@@ -63,21 +63,13 @@ def tickets(label):
 	  	json_results = []
 	 	cursor = page
 		for result in ticket_results[0:20]:
-			# localtz = pytz.timezone('America/Los_Angeles')
-			# tz_aware_timestamp = localtz.localize(result.timestamp)
-			print result.timestamp
 			ticket_day = (result.timestamp - timedelta(hours = 7)).replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 			today_day = datetime.now().replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 
-			print "TICKET DAY", ticket_day
-			print "TODAY DAY", today_day
-
 			if ticket_day == today_day:
 				today = True
-				print today
 			else:
 				today = False
-				print today
 			d = {
 	    		'ticket_id': result.ticket_id,
 				'user_id': result.user_id,
@@ -162,7 +154,7 @@ def counts():
 			day = day + timedelta(days = 1)
 			datetime_points.append(day)
 
-		query_datetime_points = [time for time in datetime_points]
+		query_datetime_points = datetime_points
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
@@ -176,7 +168,7 @@ def counts():
 			day = day + timedelta(days = 1)
 			datetime_points.append(day)
 
-		query_datetime_points = [time for time in datetime_points]
+		query_datetime_points = datetime_points
 
 		x_axis = ['x'] + [d.strftime("%Y-%m-%d %H:%M:%S") for d in datetime_points]
 		columns.append(x_axis)
@@ -196,7 +188,6 @@ def counts():
 			date_cleaned = ticket.timestamp.replace(minute = 0, second = 0, microsecond = 0)
 		else:
 			date_cleaned = ticket.timestamp.replace(hour=0, minute = 0, second = 0, microsecond = 0)
-
 
 		if ticket.sentiment_label == "positive":
 			positive_tickets.append(date_cleaned)
@@ -224,7 +215,6 @@ def counts():
 	neutral_data_points = ["neutral"]
 
 	#populate data points
-	print "POSITIVE TICKETS", positive_tickets
 	for date_and_time in query_datetime_points:
 		count = positive_tickets.count(date_and_time)
 		positive_data_points.append(count)
@@ -263,8 +253,6 @@ def counts():
 				all_source_data.append(single_source_data)
 
 		source_data[label] = all_source_data
-	
-	print columns
 
 	return jsonify(time_period = time_period, counts=json_count_results, columns = columns, source_data = source_data)
 

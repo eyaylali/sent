@@ -17,7 +17,6 @@ app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['POSTGRES_URL']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['POSTGRES_URL']
 db = SQLAlchemy(app)
-# must manually drop before recreating
 # db.create_all()
 
 session = scoped_session(sessionmaker(bind=ENGINE,
@@ -67,10 +66,6 @@ class Ticket(Base):
 		all_tickets = cls.query.all()
 		return [ticket.ticket_id for ticket in all_tickets]
 
-	def __repr__(self):
-		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
-		pass
-
 class User(Base):
 	__tablename__ = "users"
 
@@ -98,17 +93,11 @@ class User(Base):
 		all_users = cls.query.all()
 		return set([user.organization_name for user in all_users])
 
-
-	def __repr__(self):
-		# return "<User: id=%d, email=%s, password=%s, age=%d, zipcode=%s>" % (self.id, self.email, self.password, self.age, self.zipcode)
-		return "This is a user"
-
 ### End class declarations
 
 def main():
 	Base.metadata.create_all(bind=ENGINE)
 	pass
-	
 
 if __name__ == "__main__":
 	main()

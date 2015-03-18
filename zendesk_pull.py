@@ -39,7 +39,7 @@ def learn_new_data():
 	X_data = vectorizer.transform(X_data)
 	y_labels = np.array(y_labels)
 	classes = np.array(["positive", "upset", "neutral"])
-	classifier.partial_fit(X_data, y_labels, classes)
+	classifier.partial_fit(X_data, y_labels)
 	pickle.dump(today, open('last_update_time.p', 'wb'))
 
 def unpack_zendesk_users_tickets(session, user_dict, org_dict):
@@ -65,9 +65,7 @@ def unpack_zendesk_users_tickets(session, user_dict, org_dict):
 			session.refresh(user)
 
 		user_tickets = zendesk.user_tickets_requested(zendesk_user_id)
-		print user_tickets
 		#Find the last ticket id of messages already in DB in order to determine which messages to add (ticket ids increment by 1)
-		# threshold_id = Ticket.query.order_by(Ticket.ticket_id).first()
 		added_tickets = []
 		for ticket in user_tickets["tickets"]:
 			if ticket["status"] == "open" or ticket["status"] == "pending":
@@ -118,7 +116,7 @@ def predict_sentiment_label(all_content):
 	return label[0]
 
 def main(session):
-	# learn_new_data()
+	learn_new_data()
 	unpack_zendesk_users_tickets(session, USERS, ORGANIZATIONS)
     
 if __name__ == "__main__":

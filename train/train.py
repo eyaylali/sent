@@ -13,8 +13,6 @@ import json
 from sklearn.externals import joblib
 import pandas as pd
 
-
-
 text_data = []
 labels = []
 
@@ -103,7 +101,6 @@ def evaluate_model(label_true,label_predicted):
 
 def main():
     review_data, labels = parse_files('test-data/*.json')
-    # clf = create_model()
     train_model(review_data, labels)
 
 if __name__ == "__main__":
