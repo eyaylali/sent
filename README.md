@@ -5,10 +5,9 @@
 - [Technologies](#technologies)
 - [Dashboard](#dashboard)
 - [Inbox](#inbox)
-- [Sentiment Analysis](#sentiment-analysis)
-- [Machine Learning](#machine-learning)
+- [Sentiment Analysis & Machine Learning](#sentiment-analysis-machine-learning)
 - [ReactJS](#reactjs)
-- [Installation](#installation)
+- [Project Structure](#project-structure)
 
 ## Introduction
 
@@ -36,8 +35,16 @@ ReactJS, C3.js, Javascript, HTML, CSS, Bootswatch
 
 *Source pie graphs responding to clicks*
 
+## Inbox
+
 ![inbox]
 (/gifs/inbox.gif)
 
-*Viewing message in inbox, updating sentiment in system, and relpying*
+*Viewing message in inbox, updating sentiment in system, and replying*
+
+##Sentiment Analysis & Machine Learning
+
+##ReactJS
+
+##Structure
 
