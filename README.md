@@ -5,7 +5,7 @@
 - [Technologies](#technologies)
 - [Dashboard](#dashboard)
 - [Inbox](#inbox)
-- [Sentiment Analysis & Machine Learning](#sentiment-analysis-machine-learning)
+- [Sentiment Analysis & Machine Learning](#sentiment-analysis-and-machine-learning)
 - [ReactJS](#reactjs)
 - [Project Structure](#project-structure)
 
@@ -50,9 +50,11 @@ The most interesting functionality of the inbox is the ability to update the sen
 
 *Viewing message in inbox, updating sentiment in system, and replying*
 
-##Sentiment Analysis & Machine Learning
+##Sentiment Analysis and Machine Learning
 
 ##ReactJS
+
+React is a good choice when building the UI of applications that have data change over time. My application has a large amount of data flowing through it for both the dashboard and inbox and React makes it easy to fetch data and change the UI accordingly. Instead of re-rendering the the entire DOM, it avoids costly DOM operations by calculating what changes need to be made and updates the DOM tree accordingly (recursively diffs between previous and next renders of a UI). The idea of "components" is also great for organization of the UI, code reuse (I only wrote code for one pie chart, one sentiment counter, one inbox ticket row, etc), testing, and separation of concerns. The data flows are predictable and declared, React manages it all!
 
 ##Project Structure
 
