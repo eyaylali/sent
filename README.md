@@ -76,19 +76,19 @@ React is a great choice when building the UI of applications that have data chan
 
 **Main application files**
 
--routes.py: core of the Flask app, lists dashboard and inbox routes, and contains all server API endpoints sending data to client
+-[routes.py]: core of the Flask app, lists dashboard and inbox routes, and contains all server API endpoints sending data to client
 
--zendesk_pull.py: Script that pulls new tickets from Zendesk account, unpacks them to extract information needed for Senti, applies the trained classifier on the raw ticket content to assign a sentiment label to ticket, and commits ticket and user information to database. Before the unpacking process, the database is queried to check if the labels of any tickets already in database have changed (using the update_date column) and the classifier is incrementally trained on this new information.
+-[zendesk_pull.py]: Script that pulls new tickets from Zendesk account, unpacks them to extract information needed for Senti, applies the trained classifier on the raw ticket content to assign a sentiment label to ticket, and commits ticket and user information to database. Before the unpacking process, the database is queried to check if the labels of any tickets already in database have changed (using the update_date column) and the classifier is incrementally trained on this new information.
 
--model.py: Database class declarations and class methods
+-[model.py]: Database class declarations and class methods
 
--load_zendesk.py: Script to import tickets into Zendesk inbox
+-[load_zendesk.py]: Script to import tickets into Zendesk inbox
 
 **Train directory**
 
--train.py: The unpacking of the training data, class assignment for training purpose, feature extraction, building the classifier, training process, and testing process
+-[train.py]: The unpacking of the training data, class assignment for training purpose, feature extraction, building the classifier, training process, and testing process
 
--tokenize.py: In-house tokenizer that extracts relevant features (words that are strong determinants of sentiment) from raw data, used during vectorization in train.py
+-[tokenize.py]: In-house tokenizer that extracts relevant features (words that are strong determinants of sentiment) from raw data, used during vectorization in train.py
 
 ##Next Steps
 
