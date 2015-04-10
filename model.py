@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+import psycopg2
 from sqlalchemy.ext.declarative import declarative_base
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, MetaData
