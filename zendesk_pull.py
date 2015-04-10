@@ -1,6 +1,5 @@
 from zdesk import Zendesk
 from tokenizer import tokenize_text
-from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer
 import model
 from model import Ticket, User, session
 from datetime import datetime, date
@@ -21,7 +20,7 @@ print ORGANIZATIONS
 # load the saved vectorizer, classifier, and last time the database was checked for label reclassifications
 classifier = joblib.load('train/classifier.pickle')
 vectorizer = joblib.load('train/vectorizer.pickle')
-last_update = pickle.load(open('last_update_time.p', 'rb'))
+# last_update = pickle.load(open('last_update_time.p', 'rb'))
 today = datetime.utcnow()
 
 sentiment_changed_tickets = Ticket.list_changed_tickets(today)
@@ -116,7 +115,7 @@ def predict_sentiment_label(all_content):
 	return label[0]
 
 def main(session):
-	learn_new_data()
+	# learn_new_data()
 	unpack_zendesk_users_tickets(session, USERS, ORGANIZATIONS)
     
 if __name__ == "__main__":
