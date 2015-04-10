@@ -11,7 +11,6 @@ from sys import argv
 from tokenizer import tokenize_text
 import json
 from sklearn.externals import joblib
-import pandas as pd
 
 text_data = []
 labels = []
